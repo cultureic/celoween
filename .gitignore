@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+.turbo/
+out/
+dist/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Environment Files (NEVER commit secrets!)
+.env
+.env.*
+.env.local*
+.env.production*
+.env.hardhat*
+.env.vercel*
+!.env.example
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# OS/Editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# SSL Certificates & Keys
+ssl/
+*.pem
+*.key
+*.cert
+*.crt
+
+# Private keys (CRITICAL)
+*.private
+*-private-key*
+deployer-key*
+
+# Lock files (optional - uncomment if needed)
+#package-lock.json
+#pnpm-lock.yaml
+#yarn.lock
+
+# Deployment
+.vercel
+.netlify
+
+# Testing
+.coverage
+*.lcov
