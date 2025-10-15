@@ -1,0 +1,159 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin", "darwin-arm64"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==========================================
+// CELOWEEN CONTEST PLATFORM SCHEMA
+// ==========================================
+
+model User {
+  id            String       @id @default(cuid())
+  walletAddress String       @unique
+  email         String?      @unique
+  displayName   String?
+  avatarUrl     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relations
+  createdContests Contest[]  @relation("ContestCreator")
+  submissions     Submission[]
+  votes          Vote[]
+  rewards        Reward[]
+}
+
+model Contest {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  title           String
+  description     String
+  category        String        // "Scariest Song", "Best Costume", etc.
+  coverImageUrl   String?
+  
+  // Prize information
+  prizeAmount     String        // Store as string to handle big numbers
+  prizeToken      String        @default("cUSD") // cUSD, CELO, etc.
+  
+  // Dates
+  startDate       DateTime
+  endDate         DateTime
+  votingEndDate   DateTime
+  
+  // Blockchain
+  creatorAddress  String
+  contractAddress String?
+  chainId         Int           @default(44787) // Alfajores testnet
+  
+  // Status
+  status          ContestStatus @default(DRAFT)
+  
+  // Metadata
+  rules           String?       // Markdown rules
+  maxSubmissions  Int           @default(1) // Max submissions per user
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  creator         User          @relation("ContestCreator", fields: [creatorAddress], references: [walletAddress])
+  submissions     Submission[]
+  rewards         Reward[]
+  
+  @@index([status, startDate])
+  @@index([slug])
+}
+
+model Submission {
+  id              String   @id @default(cuid())
+  contestId       String
+  submitterAddress String
+  
+  // Submission content
+  title           String
+  description     String?
+  mediaUrl        String   // Image, video, audio URL (IPFS/Arweave)
+  mediaType       String   // "image", "video", "audio"
+  thumbnailUrl    String?
+  
+  // Voting stats
+  voteCount       Int      @default(0)
+  
+  // Metadata
+  metadata        String?  // JSON metadata
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  contest         Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  submitter       User     @relation(fields: [submitterAddress], references: [walletAddress])
+  votes           Vote[]
+  
+  @@unique([contestId, submitterAddress]) // One submission per user per contest
+  @@index([contestId, voteCount])
+}
+
+model Vote {
+  id               String   @id @default(cuid())
+  submissionId     String
+  voterAddress     String
+  
+  // Vote details
+  weight           Int      @default(1) // Future: weighted voting
+  transactionHash  String?  // On-chain tx hash (gasless)
+  
+  createdAt        DateTime @default(now())
+  
+  // Relations
+  submission       Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  voter            User       @relation(fields: [voterAddress], references: [walletAddress])
+  
+  @@unique([submissionId, voterAddress]) // One vote per user per submission
+  @@index([submissionId])
+  @@index([voterAddress])
+}
+
+model Reward {
+  id               String   @id @default(cuid())
+  contestId        String
+  winnerAddress    String
+  
+  // Reward details
+  position         Int      // 1st, 2nd, 3rd place
+  amount           String   // Prize amount
+  token            String   // Token type (cUSD, CELO)
+  
+  // Claim status
+  claimed          Boolean  @default(false)
+  claimedAt        DateTime?
+  transactionHash  String?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  contest          Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  winner           User     @relation(fields: [winnerAddress], references: [walletAddress])
+  
+  @@unique([contestId, winnerAddress])
+  @@index([winnerAddress, claimed])
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum ContestStatus {
+  DRAFT       // Being created
+  ACTIVE      // Accepting submissions
+  VOTING      // Voting period
+  ENDED       // Contest completed
+  CANCELLED   // Cancelled by creator
+}

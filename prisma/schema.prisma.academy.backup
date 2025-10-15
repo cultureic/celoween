@@ -1,0 +1,219 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin", "darwin-arm64"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Category {
+  id        String   @id
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Course    Course[]
+}
+
+model Certificate {
+  id              String   @id
+  userId          String
+  courseId        String
+  chainId         Int
+  contractAddress String
+  tokenId         String
+  txHash          String
+  issuedAt        DateTime @default(now())
+  Course          Course   @relation(fields: [courseId], references: [id])
+  User            User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, courseId])
+}
+
+model Course {
+  id               String             @id
+  slug             String             @unique
+  title            String
+  subtitle         String?
+  categoryId       String?
+  levelId          String?
+  coverUrl         String?
+  promoVideoUrl    String?
+  durationHours    Int?
+  lessonsCount     Int?
+  rating           Float?
+  ratingCount      Int?
+  learners         Int?
+  isFree           Boolean            @default(true)
+  visibility       Visibility         @default(PUBLIC)
+  status           PublishStatus      @default(PUBLISHED)
+  publishedAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  Certificate      Certificate[]
+  Category         Category?          @relation(fields: [categoryId], references: [id])
+  Level            Level?             @relation(fields: [levelId], references: [id])
+  CourseEnrollment CourseEnrollment[]
+  CourseInstructor CourseInstructor[]
+  CourseNftConfig  CourseNftConfig?
+  CourseTag        CourseTag[]
+  Module           Module[]
+}
+
+model CourseEnrollment {
+  id        String   @id
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  Course    Course   @relation(fields: [courseId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model CourseInstructor {
+  courseId     String
+  instructorId String
+  role         String?
+  Course       Course     @relation(fields: [courseId], references: [id])
+  Instructor   Instructor @relation(fields: [instructorId], references: [id])
+
+  @@id([courseId, instructorId])
+}
+
+model CourseNftConfig {
+  id                  String      @id
+  courseId            String      @unique
+  standard            NftStandard @default(ERC721)
+  chainId             Int
+  contractAddress     String
+  metadataBaseUri     String?
+  autoIssueOnComplete Boolean     @default(false)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime
+  Course              Course      @relation(fields: [courseId], references: [id])
+}
+
+model CourseTag {
+  courseId String
+  tagId    String
+  Course   Course @relation(fields: [courseId], references: [id])
+  Tag      Tag    @relation(fields: [tagId], references: [id])
+
+  @@id([courseId, tagId])
+}
+
+model Instructor {
+  id               String             @id
+  name             String
+  title            String?
+  avatarUrl        String?
+  bio              String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  CourseInstructor CourseInstructor[]
+}
+
+model Lesson {
+  id                 String               @id
+  moduleId           String
+  index              Int
+  slug               String?
+  title              String
+  summary            String?
+  contentMdx         String?
+  status             PublishStatus        @default(PUBLISHED)
+  visibility         Visibility           @default(PUBLIC)
+  publishedAt        DateTime?
+  updatedAt          DateTime
+  createdAt          DateTime             @default(now())
+  Module             Module               @relation(fields: [moduleId], references: [id])
+  UserLessonProgress UserLessonProgress[]
+
+  @@unique([moduleId, index])
+}
+
+model Level {
+  id        String   @id
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Course    Course[]
+}
+
+model Module {
+  id        String   @id
+  courseId  String
+  index     Int
+  title     String
+  summary   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Lesson    Lesson[]
+  Course    Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([courseId, index])
+}
+
+model Tag {
+  id        String      @id
+  slug      String      @unique
+  name      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime
+  CourseTag CourseTag[]
+}
+
+model User {
+  id                 String               @id
+  walletAddress      String?              @unique
+  email              String?              @unique
+  displayName        String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  Certificate        Certificate[]
+  CourseEnrollment   CourseEnrollment[]
+  UserLessonProgress UserLessonProgress[]
+}
+
+model UserLessonProgress {
+  id            String               @id
+  userId        String
+  lessonId      String
+  status        LessonProgressStatus @default(NOT_STARTED)
+  secondsSpent  Int                  @default(0)
+  lastVisitedAt DateTime?
+  completedAt   DateTime?
+  Lesson        Lesson               @relation(fields: [lessonId], references: [id])
+  User          User                 @relation(fields: [userId], references: [id])
+
+  @@unique([userId, lessonId])
+}
+
+enum LessonProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum NftStandard {
+  ERC721
+  ERC1155
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Visibility {
+  PUBLIC
+  LOGGED_IN
+  WALLET
+}
