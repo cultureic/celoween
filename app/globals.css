@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'GT Alpina Fine Standard Thin Trial';
+  src: url('/fonts/GT-Alpina-Fine-Standard-Thin-Trial.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GT Alpina VAR Trial';
+  src: url('/fonts/GT-Alpina-VAR-Trial.woff2') format('woff2');
+  font-weight: 40 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-display: 'GrilliEnd', ui-serif, system-ui;
+  --font-body: 'Inter', ui-sans-serif, system-ui;
+  --font-title: 'GT Alpina Fine Standard Thin Trial', 'Georgia', 'Times New Roman', serif;
+  --font-italic: 'GT Alpina Fine Standard Thin Trial', 'Georgia', 'Times New Roman', serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+
+    /* Celoween Halloween theme - base: dark theme */
+    --celo-bg: #0B0B0C;              /* Abyss Black */
+    --celo-fg: #F2F0EA;              /* Bone White */
+    --celo-muted: #9ca3af;           /* gray-400/500 */
+    --celo-yellow: #FF6B00;          /* Pumpkin Orange (primary) */
+    --celo-yellow-weak: rgba(255,107,0,0.18);
+    --celo-accent: #B873FF;          /* Neon Violet (secondary) */
+    --celo-border: rgba(255,107,0,0.3); /* subtle orange borders */
+    
+    /* Halloween extended palette */
+    --spook-orange: #FF6B00;         /* Pumpkin Orange */
+    --spook-violet: #B873FF;         /* Neon Violet */
+    --spook-surface: #1B1B1E;        /* Charcoal Gray */
+    --spook-green: #9FFF5B;          /* Acid Green */
+    --spook-red: #FF4040;            /* Blood Red */
+    --spook-blue: #5B8CFF;           /* Ghost Blue */
+    --spook-glow-orange: rgba(255,107,0,0.4);
+    --spook-glow-violet: rgba(184,115,255,0.4);
+  }
+  
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  /* Orange theme (light background, dark foreground) */
+  .theme-orange-dark {
+    --celo-bg: #FF6B00;            /* Pumpkin Orange background */
+    --celo-fg: #0B0B0C;            /* black text on orange */
+    --celo-muted: #4a4a4a;         /* darker gray for better contrast */
+    --celo-border: #0B0B0C;        /* black borders on orange */
+    --celo-yellow: #0B0B0C;        /* black accent instead of orange on orange */
+    --celo-yellow-weak: rgba(11,11,12,0.12);
+    --celo-accent: #B873FF;        /* violet accent */
+  }
+
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-title);
+    font-weight: 100;
+  }
+
+  .font-italic {
+    font-family: var(--font-italic);
+    font-weight: 100;
+    font-style: italic;
+  }
+
+  .font-title {
+    font-family: var(--font-title);
+    font-weight: 100;
+  }
+
+  .font-title-italic {
+    font-family: var(--font-title);
+    font-weight: 100;
+    font-style: italic;
+  }
+}
+
+/* Celoween theme utility classes */
+.hairline {
+  border-width: 1px;
+  border-color: var(--celo-border);
+}
+
+.surface {
+  background: var(--spook-surface, var(--celo-card, white));
+}
+
+.glow-orange {
+  box-shadow: 0 0 20px var(--spook-glow-orange),
+              0 0 40px var(--spook-glow-orange);
+}
+
+.glow-violet {
+  box-shadow: 0 0 20px var(--spook-glow-violet),
+              0 0 40px var(--spook-glow-violet);
+}
+
+.glow-border-orange {
+  border: 1px solid var(--spook-orange);
+  box-shadow: 0 0 10px var(--spook-glow-orange);
+}
+
+.glow-border-violet {
+  border: 1px solid var(--spook-violet);
+  box-shadow: 0 0 10px var(--spook-glow-violet);
+}
+
+.gradient-spooky {
+  background: linear-gradient(to bottom, #0B0B0C, #1B1B1E);
+}
+
+.gradient-halloween {
+  background: linear-gradient(135deg, var(--spook-orange), var(--spook-violet));
+}
+
+/* focus ring */
+:focus-visible {
+  outline: 2px solid var(--celo-yellow);
+  outline-offset: 2px;
+}
+
+/* Typography utilities */
+.font-display { font-family: var(--font-gt, var(--font-title, ui-serif)); }
+.font-sans { font-family: var(--font-inter, var(--font-body, ui-sans-serif)); }
+.brand-em { font-style: italic; color: var(--celo-yellow); }
+
+/* Prose link override for brand */
+.prose a { color: var(--celo-yellow); }
+
+/* Smooth scroll behavior (respects user preference) */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced prose styling for course content */
+.prose-course {
+  @apply prose prose-lg max-w-none;
+  @apply dark:prose-invert;
+  line-height: 1.8;
+}
+
+.prose-course h1,
+.prose-course h2,
+.prose-course h3,
+.prose-course h4 {
+  scroll-margin-top: 6rem;
+  font-family: var(--font-title);
+}
+
+.prose-course p {
+  margin-bottom: 1.5rem;
+}
+
+.prose-course code {
+  font-size: 0.875em;
+  background-color: rgba(252, 255, 82, 0.1);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.prose-course pre {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.prose-course img {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.prose-course blockquote {
+  border-left-width: 4px;
+  border-left-color: var(--celo-yellow);
+  background: rgba(252, 255, 82, 0.05);
+  padding: 1rem 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Responsive utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-first responsive improvements */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  .hover\:opacity-80:hover {
+    opacity: 1;
+  }
+}
+
+
+
