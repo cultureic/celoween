@@ -37,7 +37,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, title, description, startDate, endDate, votingEndDate, prizePool } = body;
+    const { id, title, description, startDate, endDate, votingEndDate, prizeAmount } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Contest ID required' }, { status: 400 });
@@ -52,7 +52,7 @@ export async function PUT(request: Request) {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         votingEndDate: new Date(votingEndDate),
-        prizePool,
+        prizeAmount,
       },
     });
 

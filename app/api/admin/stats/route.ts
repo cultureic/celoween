@@ -19,15 +19,15 @@ export async function GET(request: Request) {
     const contests = await prisma.contest.findMany({
       select: {
         status: true,
-        prizePool: true,
+        prizeAmount: true,
       },
     });
 
     const statusCounts = {
-      DRAFT: contests.filter(c => c.status === 'DRAFT').length,
-      ACTIVE: contests.filter(c => c.status === 'ACTIVE').length,
-      VOTING: contests.filter(c => c.status === 'VOTING').length,
-      ENDED: contests.filter(c => c.status === 'ENDED').length,
+      draft: contests.filter(c => c.status === 'DRAFT').length,
+      active: contests.filter(c => c.status === 'ACTIVE').length,
+      voting: contests.filter(c => c.status === 'VOTING').length,
+      ended: contests.filter(c => c.status === 'ENDED').length,
     };
 
     // Get submission stats
@@ -52,20 +52,20 @@ export async function GET(request: Request) {
 
     // Get unique voters
     const uniqueVoters = await prisma.vote.findMany({
-      select: { userId: true },
-      distinct: ['userId'],
+      select: { voterAddress: true },
+      distinct: ['voterAddress'],
     });
 
     // Calculate total prize pool
-    const totalPrizePool = contests.reduce((sum, c) => sum + Number(c.prizePool), 0);
+    const totalPrizePool = contests.reduce((sum, c) => sum + Number(c.prizeAmount), 0);
 
     return NextResponse.json({
       contests: {
         total: contestCount,
-        draft: statusCounts.DRAFT,
-        active: statusCounts.ACTIVE,
-        voting: statusCounts.VOTING,
-        ended: statusCounts.ENDED,
+        draft: statusCounts.draft,
+        active: statusCounts.active,
+        voting: statusCounts.voting,
+        ended: statusCounts.ended,
       },
       submissions: {
         total: submissionCount,

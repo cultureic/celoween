@@ -41,7 +41,7 @@ async function main() {
   console.log(`   ID: ${contest.id}`);
   console.log(`   Title: ${contest.title}`);
   console.log(`   Status: ${contest.status}`);
-  console.log(`   Prize Pool: ${contest.prizePool} CELO`);
+  console.log(`   Prize Pool: ${contest.prizeAmount} ${contest.prizeToken}`);
   console.log(`   Starts: ${contest.startDate.toISOString()}`);
   console.log(`   Ends: ${contest.endDate.toISOString()}`);
   console.log(`   Voting Ends: ${contest.votingEndDate.toISOString()}`);

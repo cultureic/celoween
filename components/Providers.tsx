@@ -16,9 +16,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
   const clientId = process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID; // Optional for v2.16.0
 
-  // ZeroDev Project ID - for now using test project from Motus
-  // TODO: Create dedicated Celo Academy ZeroDev project
+  // ZeroDev Project ID for gasless voting
   const zeroDevProjectId = process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID || 'e46f4ac3-404e-42fc-a3d3-1c75846538a8';
+
 
   return (
     <PrivyProvider

@@ -22,6 +22,7 @@ export default function SubmissionsPage() {
 
   useEffect(() => {
     fetchSubmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function fetchSubmissions() {

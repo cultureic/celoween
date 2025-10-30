@@ -61,7 +61,7 @@ export default function ProfilePage() {
             {/* User Info */}
             <div className="flex-grow text-center md:text-left">
               <h1 className="font-creepster text-4xl text-spook-orange mb-2">
-                {user?.email || shortAddress}
+                {(typeof user?.email === 'string' ? user.email : user?.email?.address) || shortAddress}
               </h1>
               <p className="text-gray-400 mb-4">
                 {walletAddress && (
@@ -105,9 +105,9 @@ export default function ProfilePage() {
             <div className="text-center py-12">
               <div className="text-5xl mb-3">📭</div>
               <p className="text-gray-400 mb-4">No submissions yet</p>
-              <Link href="/contests">
+              <Link href="/">
                 <button className="bg-spook-violet hover:bg-spook-violet/80 px-6 py-2 rounded-xl hover:shadow-glow-violet transition-all">
-                  Browse Contests
+                  View Contest
                 </button>
               </Link>
             </div>
@@ -143,14 +143,14 @@ export default function ProfilePage() {
 
         {/* Quick Actions */}
         <div className="mt-8 flex gap-4 justify-center">
-          <Link href="/contests">
+          <Link href="/">
             <button className="bg-spook-orange hover:bg-spook-orange/80 px-6 py-3 rounded-2xl font-semibold hover:shadow-glow-orange transition-all">
-              🎤 Browse Contests
+              🎤 View Contest
             </button>
           </Link>
-          <Link href="/create">
+          <Link href="/admin">
             <button className="bg-spook-violet hover:bg-spook-violet/80 px-6 py-3 rounded-2xl font-semibold hover:shadow-glow-violet transition-all">
-              🎃 Create Contest
+              👻 Admin
             </button>
           </Link>
         </div>

@@ -107,6 +107,7 @@ export const MdxComponents = {
     <img 
       className="rounded-lg my-6 max-w-full h-auto shadow-lg"
       loading="lazy"
+      alt={props.alt || ''}
       {...props} 
     />
   ),

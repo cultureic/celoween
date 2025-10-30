@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
     const ping = await prisma.$queryRaw`SELECT 1 as ok`;
-    let courseCount: number | null = null;
+    let contestCount: number | null = null;
     try {
-      courseCount = await prisma.course.count();
+      contestCount = await prisma.contest.count();
     } catch {
-      courseCount = null;
+      contestCount = null;
     }
-    return NextResponse.json({ ok: true, ping, courseCount });
+    return NextResponse.json({ ok: true, ping, contestCount });
   } catch (err: any) {
     return NextResponse.json({
       ok: false,

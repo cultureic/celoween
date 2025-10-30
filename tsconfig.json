@@ -52,6 +52,7 @@
   ],
   "exclude": [
     "node_modules",
+    "_archive/**/*",
     "deploy/**/*",
     "scripts/**/*",
     "hardhat.config.*",

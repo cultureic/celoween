@@ -4,7 +4,7 @@ import { isAdmin } from '@/lib/auth/admin';
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const wallet = request.headers.get('x-wallet-address');
@@ -13,7 +13,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Delete associated votes first
     await prisma.vote.deleteMany({

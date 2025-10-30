@@ -20,6 +20,7 @@ export default function ResultsPage() {
 
   useEffect(() => {
     fetchResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function fetchResults() {

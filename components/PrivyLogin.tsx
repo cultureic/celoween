@@ -223,7 +223,7 @@ export default function PrivyLogin() {
               {/* Account Button */}
               <button
                 onClick={() => {
-                  router.push('/dashboard');
+                  router.push('/profile');
                   setShowDropdown(false);
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-celo-black dark:text-celo-yellow hover:bg-white/30 dark:hover:bg-black/30 rounded-xl transition-all duration-200 backdrop-blur-lg group font-medium"

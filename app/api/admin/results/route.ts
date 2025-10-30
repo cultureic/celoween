@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     // Get submissions with vote counts, sorted by votes
     const submissions = await prisma.submission.findMany({
       include: {
-        user: {
+        submitter: {
           select: {
-            wallet: true,
+            walletAddress: true,
           },
         },
         _count: {
@@ -23,9 +23,7 @@ export async function GET(request: Request) {
         },
       },
       orderBy: {
-        votes: {
-          _count: 'desc',
-        },
+        voteCount: 'desc',
       },
     });
 
@@ -33,10 +31,10 @@ export async function GET(request: Request) {
     const leaderboard = submissions.map((sub, index) => ({
       rank: index + 1,
       id: sub.id,
-      imageUrl: sub.imageUrl,
-      description: sub.description,
-      wallet: sub.user.wallet,
-      voteCount: sub._count.votes,
+      imageUrl: sub.mediaUrl,
+      description: sub.description || sub.title,
+      wallet: sub.submitter.walletAddress,
+      voteCount: sub.voteCount,
     }));
 
     return NextResponse.json(leaderboard);

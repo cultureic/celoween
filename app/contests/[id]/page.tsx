@@ -22,8 +22,9 @@ async function getContestData(id: string) {
   return contest;
 }
 
-export default async function ContestDetailPage({ params }: { params: { id: string } }) {
-  const contest = await getContestData(params.id);
+export default async function ContestDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const contest = await getContestData(id);
   
   if (!contest) {
     return (
@@ -117,16 +118,16 @@ export default async function ContestDetailPage({ params }: { params: { id: stri
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {contest.submissions.map((submission) => (
                   <div key={submission.id} className="bg-spook-bg rounded-xl overflow-hidden border border-spook-700">
-                    {submission.imageUrl && (
+                    {submission.mediaUrl && (
                       <img 
-                        src={submission.imageUrl} 
-                        alt={submission.description || 'Submission'} 
+                        src={submission.mediaUrl} 
+                        alt={submission.description || submission.title || 'Submission'} 
                         className="w-full h-64 object-cover"
                       />
                     )}
                     <div className="p-4">
                       <p className="text-sm text-gray-300 mb-2">
-                        {submission.description}
+                        {submission.description || submission.title}
                       </p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">

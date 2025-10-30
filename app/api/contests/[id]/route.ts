@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma';
 // GET /api/contests/[id] - Get single contest with submissions
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const contest = await prisma.contest.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         creator: {
           select: {
@@ -65,14 +66,15 @@ export async function GET(
 // PATCH /api/contests/[id] - Update contest
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { status, contractAddress } = body;
 
     const contest = await prisma.contest.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(status && { status }),
         ...(contractAddress && { contractAddress }),

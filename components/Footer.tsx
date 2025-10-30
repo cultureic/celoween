@@ -1,5 +1,6 @@
 import FormSubscribe from './FormSubscribe';
 import CeloLogo from './CeloLogo';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -24,15 +25,15 @@ export default function Footer() {
           <div>
             <h3 className="font-creepster text-xl text-spook-orange mb-4">Compete</h3>
             <div className="space-y-2 text-gray-300">
-              <a href="/" className="block hover:text-spook-violet transition-colors">
+              <Link href="/" as={"/ " as any} className="block hover:text-spook-violet transition-colors">
                 View Contest
-              </a>
-              <a href="/profile" className="block hover:text-spook-violet transition-colors">
+              </Link>
+              <Link href="/profile" as={"/profile" as any} className="block hover:text-spook-violet transition-colors">
                 My Profile
-              </a>
-              <a href="/admin" className="block hover:text-spook-violet transition-colors">
+              </Link>
+              <Link href="/admin" as={"/admin" as any} className="block hover:text-spook-violet transition-colors">
                 Admin
-              </a>
+              </Link>
             </div>
           </div>
 

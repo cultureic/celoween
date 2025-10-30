@@ -13,13 +13,10 @@ export async function GET(request: Request) {
     // Get all submissions with vote counts and user info
     const submissions = await prisma.submission.findMany({
       include: {
-        user: {
+        submitter: {
           select: {
-            wallet: true,
+            walletAddress: true,
           },
-        },
-        _count: {
-          select: { votes: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -29,10 +26,10 @@ export async function GET(request: Request) {
     const formatted = submissions.map(sub => ({
       id: sub.id,
       contestId: sub.contestId,
-      imageUrl: sub.imageUrl,
-      description: sub.description,
-      wallet: sub.user.wallet,
-      voteCount: sub._count.votes,
+      imageUrl: sub.mediaUrl,
+      description: sub.description || sub.title,
+      wallet: sub.submitter.walletAddress,
+      voteCount: sub.voteCount,
       createdAt: sub.createdAt,
     }));
 

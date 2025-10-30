@@ -128,10 +128,10 @@ function LoginContent() {
             
             <div className="mt-6 flex flex-col sm:flex-row gap-4 text-sm">
               <Link 
-                href="/academy" 
+                href="/" 
                 className="text-celo-yellow hover:text-yellow-600 transition-colors"
               >
-                Ver cursos públicos
+                Ver concursos
               </Link>
               <Link 
                 href="/" 

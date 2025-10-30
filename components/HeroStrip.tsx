@@ -81,8 +81,8 @@ export default function HeroStrip() {
             transition={{ duration: 0.6, delay: 1.4 }}
             className="flex flex-col sm:flex-row gap-4 sm:gap-6"
           >
-            <Link href="/academy" className="group relative overflow-hidden rounded-full border-celo-fg dark:border-celo-yellow border-[0.3px] px-8 py-3 font-bold text-black dark:text-celo-yellow text-xs sm:text-sm bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-celo-yellow focus-visible:ring-offset-0 inline-block">
-              <span className="relative z-10 dark:group-hover:text-black">Construye con Celo</span>
+            <Link href="/" as={"/" as any} className="group relative overflow-hidden rounded-full border-celo-fg dark:border-celo-yellow border-[0.3px] px-8 py-3 font-bold text-black dark:text-celo-yellow text-xs sm:text-sm bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-celo-yellow focus-visible:ring-offset-0 inline-block">
+              <span className="relative z-10 dark:group-hover:text-black">Ver Concursos</span>
               <span className="pointer-events-none absolute inset-0 m-auto h-full w-full rounded-full bg-[#fcf6f1] scale-0 transition-transform duration-300 ease-out group-hover:scale-150 z-0" />
             </Link>
             

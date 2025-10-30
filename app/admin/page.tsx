@@ -206,7 +206,7 @@ function ActionButton({ href, icon, label, description }: {
 }) {
   return (
     <Link
-      href={href}
+      href={href as any}
       className="bg-spook-800 border border-spook-700 rounded-lg p-4 hover:border-spook-orange hover:shadow-glow-orange transition-all group"
     >
       <div className="text-2xl mb-2">{icon}</div>
