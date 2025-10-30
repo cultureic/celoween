@@ -132,7 +132,7 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
               name="title"
               required
               placeholder="My Spooky Costume"
-              className="w-full px-4 py-3 bg-spook-800 border border-spook-700 rounded-lg text-white placeholder-gray-500 focus:border-spook-orange focus:outline-none"
+              className="w-full px-4 py-3 bg-white border border-spook-700 rounded-lg text-black placeholder-gray-500 focus:border-spook-orange focus:outline-none"
             />
           </div>
 
@@ -145,7 +145,7 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
               required
               rows={4}
               placeholder="Describe your costume..."
-              className="w-full px-4 py-3 bg-spook-800 border border-spook-700 rounded-lg text-white placeholder-gray-500 focus:border-spook-orange focus:outline-none"
+              className="w-full px-4 py-3 bg-white border border-spook-700 rounded-lg text-black placeholder-gray-500 focus:border-spook-orange focus:outline-none"
             />
           </div>
 
