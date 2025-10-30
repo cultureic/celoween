@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="/Users/cesarangulo/Documents/celo-academy/celo-mx/tests/unit/smoke.test.ts">
+    <testCase name="🔥 Jest Smoke Tests - Module Loading Essential dependencies load correctly" duration="33"/>
+    <testCase name="🔥 Jest Smoke Tests - Module Loading Environment configuration is accessible" duration="1"/>
+    <testCase name="🔥 Jest Smoke Tests - Module Loading Basic JavaScript/TypeScript functionality works" duration="0"/>
+  </file>
+</testExecutions>

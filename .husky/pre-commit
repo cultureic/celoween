@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Prevent commits to main branch
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "main" ]; then
+  echo "🚨 You can't commit directly to main branch"
+  echo "Create a feature branch first:"
+  echo "git checkout -b feature/your-feature-name"
+  exit 1
+fi
+
+# Check for common issues
+echo "🔍 Running pre-commit checks..."
+
+# Check if .env.local is being committed (shouldn't be)
+if git diff --cached --name-only | grep -q "\.env\.local\|\.env$"; then
+  echo "🚨 ERROR: You're trying to commit environment files (.env.local or .env)"
+  echo "These files contain secrets and should not be committed!"
+  echo "Run: git reset HEAD .env.local .env"
+  exit 1
+fi
+
+# Run TypeScript check
+echo "📝 Checking TypeScript..."
+if ! npm run type-check; then
+  echo "🚨 TypeScript check failed. Fix errors before committing."
+  exit 1
+fi
+
+# Run unit tests
+echo "🧪 Running unit tests..."
+if ! npm run test:unit; then
+  echo "🚨 Unit tests failed. Fix tests before committing."
+  exit 1
+fi
+
+# Run linting
+echo "🧹 Running linter..."
+if ! npm run lint; then
+  echo "🚨 Linting failed. Fix issues before committing."
+  exit 1
+fi
+
+echo "✅ All checks passed! Ready to commit."

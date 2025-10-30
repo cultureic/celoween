@@ -1,0 +1,38 @@
+a4674ef070b9c3d7bcf3f1e281711c55
+/**
+ * Jest Smoke Tests - Basic functionality validation
+ * 
+ * These tests verify that core modules and utilities work correctly
+ * without requiring browser or network access.
+ */ "use strict";
+describe('🔥 Jest Smoke Tests - Module Loading', ()=>{
+    test('Essential dependencies load correctly', ()=>{
+        // Test that critical dependencies can be imported
+        expect(()=>require('react')).not.toThrow();
+        expect(()=>require('next')).not.toThrow();
+        expect(()=>require('@prisma/client')).not.toThrow();
+    });
+    test('Environment configuration is accessible', ()=>{
+        // Verify test environment is set up
+        expect(process.env.NODE_ENV).toBe('test');
+        expect(process.env.NEXTAUTH_URL).toBeDefined();
+        expect(process.env.NEXTAUTH_SECRET).toBeDefined();
+    });
+    test('Basic JavaScript/TypeScript functionality works', ()=>{
+        // Basic smoke tests for JS/TS functionality
+        const testObj = {
+            key: 'value'
+        };
+        expect(testObj.key).toBe('value');
+        const testArray = [
+            1,
+            2,
+            3
+        ];
+        expect(testArray).toHaveLength(3);
+        const testPromise = Promise.resolve('test');
+        expect(testPromise).resolves.toBe('test');
+    });
+});
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9jZXNhcmFuZ3Vsby9Eb2N1bWVudHMvY2Vsby1hY2FkZW15L2NlbG8tbXgvdGVzdHMvdW5pdC9zbW9rZS50ZXN0LnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogSmVzdCBTbW9rZSBUZXN0cyAtIEJhc2ljIGZ1bmN0aW9uYWxpdHkgdmFsaWRhdGlvblxuICogXG4gKiBUaGVzZSB0ZXN0cyB2ZXJpZnkgdGhhdCBjb3JlIG1vZHVsZXMgYW5kIHV0aWxpdGllcyB3b3JrIGNvcnJlY3RseVxuICogd2l0aG91dCByZXF1aXJpbmcgYnJvd3NlciBvciBuZXR3b3JrIGFjY2Vzcy5cbiAqL1xuXG5kZXNjcmliZSgn8J+UpSBKZXN0IFNtb2tlIFRlc3RzIC0gTW9kdWxlIExvYWRpbmcnLCAoKSA9PiB7XG4gIFxuICB0ZXN0KCdFc3NlbnRpYWwgZGVwZW5kZW5jaWVzIGxvYWQgY29ycmVjdGx5JywgKCkgPT4ge1xuICAgIC8vIFRlc3QgdGhhdCBjcml0aWNhbCBkZXBlbmRlbmNpZXMgY2FuIGJlIGltcG9ydGVkXG4gICAgZXhwZWN0KCgpID0+IHJlcXVpcmUoJ3JlYWN0JykpLm5vdC50b1Rocm93KClcbiAgICBleHBlY3QoKCkgPT4gcmVxdWlyZSgnbmV4dCcpKS5ub3QudG9UaHJvdygpXG4gICAgZXhwZWN0KCgpID0+IHJlcXVpcmUoJ0BwcmlzbWEvY2xpZW50JykpLm5vdC50b1Rocm93KClcbiAgfSlcblxuICB0ZXN0KCdFbnZpcm9ubWVudCBjb25maWd1cmF0aW9uIGlzIGFjY2Vzc2libGUnLCAoKSA9PiB7XG4gICAgLy8gVmVyaWZ5IHRlc3QgZW52aXJvbm1lbnQgaXMgc2V0IHVwXG4gICAgZXhwZWN0KHByb2Nlc3MuZW52Lk5PREVfRU5WKS50b0JlKCd0ZXN0JylcbiAgICBleHBlY3QocHJvY2Vzcy5lbnYuTkVYVEFVVEhfVVJMKS50b0JlRGVmaW5lZCgpXG4gICAgZXhwZWN0KHByb2Nlc3MuZW52Lk5FWFRBVVRIX1NFQ1JFVCkudG9CZURlZmluZWQoKVxuICB9KVxuXG4gIHRlc3QoJ0Jhc2ljIEphdmFTY3JpcHQvVHlwZVNjcmlwdCBmdW5jdGlvbmFsaXR5IHdvcmtzJywgKCkgPT4ge1xuICAgIC8vIEJhc2ljIHNtb2tlIHRlc3RzIGZvciBKUy9UUyBmdW5jdGlvbmFsaXR5XG4gICAgY29uc3QgdGVzdE9iaiA9IHsga2V5OiAndmFsdWUnIH1cbiAgICBleHBlY3QodGVzdE9iai5rZXkpLnRvQmUoJ3ZhbHVlJylcbiAgICBcbiAgICBjb25zdCB0ZXN0QXJyYXkgPSBbMSwgMiwgM11cbiAgICBleHBlY3QodGVzdEFycmF5KS50b0hhdmVMZW5ndGgoMylcbiAgICBcbiAgICBjb25zdCB0ZXN0UHJvbWlzZSA9IFByb21pc2UucmVzb2x2ZSgndGVzdCcpXG4gICAgZXhwZWN0KHRlc3RQcm9taXNlKS5yZXNvbHZlcy50b0JlKCd0ZXN0JylcbiAgfSlcbn0pIl0sIm5hbWVzIjpbImRlc2NyaWJlIiwidGVzdCIsImV4cGVjdCIsInJlcXVpcmUiLCJub3QiLCJ0b1Rocm93IiwicHJvY2VzcyIsImVudiIsIk5PREVfRU5WIiwidG9CZSIsIk5FWFRBVVRIX1VSTCIsInRvQmVEZWZpbmVkIiwiTkVYVEFVVEhfU0VDUkVUIiwidGVzdE9iaiIsImtleSIsInRlc3RBcnJheSIsInRvSGF2ZUxlbmd0aCIsInRlc3RQcm9taXNlIiwiUHJvbWlzZSIsInJlc29sdmUiLCJyZXNvbHZlcyJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7O0NBS0M7QUFFREEsU0FBUyx3Q0FBd0M7SUFFL0NDLEtBQUsseUNBQXlDO1FBQzVDLGtEQUFrRDtRQUNsREMsT0FBTyxJQUFNQyxRQUFRLFVBQVVDLEdBQUcsQ0FBQ0MsT0FBTztRQUMxQ0gsT0FBTyxJQUFNQyxRQUFRLFNBQVNDLEdBQUcsQ0FBQ0MsT0FBTztRQUN6Q0gsT0FBTyxJQUFNQyxRQUFRLG1CQUFtQkMsR0FBRyxDQUFDQyxPQUFPO0lBQ3JEO0lBRUFKLEtBQUssMkNBQTJDO1FBQzlDLG9DQUFvQztRQUNwQ0MsT0FBT0ksUUFBUUMsR0FBRyxDQUFDQyxRQUFRLEVBQUVDLElBQUksQ0FBQztRQUNsQ1AsT0FBT0ksUUFBUUMsR0FBRyxDQUFDRyxZQUFZLEVBQUVDLFdBQVc7UUFDNUNULE9BQU9JLFFBQVFDLEdBQUcsQ0FBQ0ssZUFBZSxFQUFFRCxXQUFXO0lBQ2pEO0lBRUFWLEtBQUssbURBQW1EO1FBQ3RELDRDQUE0QztRQUM1QyxNQUFNWSxVQUFVO1lBQUVDLEtBQUs7UUFBUTtRQUMvQlosT0FBT1csUUFBUUMsR0FBRyxFQUFFTCxJQUFJLENBQUM7UUFFekIsTUFBTU0sWUFBWTtZQUFDO1lBQUc7WUFBRztTQUFFO1FBQzNCYixPQUFPYSxXQUFXQyxZQUFZLENBQUM7UUFFL0IsTUFBTUMsY0FBY0MsUUFBUUMsT0FBTyxDQUFDO1FBQ3BDakIsT0FBT2UsYUFBYUcsUUFBUSxDQUFDWCxJQUFJLENBQUM7SUFDcEM7QUFDRiJ9

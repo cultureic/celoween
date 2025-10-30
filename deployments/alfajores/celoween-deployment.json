@@ -1,0 +1,20 @@
+{
+  "network": "alfajores",
+  "chainId": 44787,
+  "deployer": "0x9f42Caf52783EF12d8174d33c281a850b8eA58aD",
+  "deployedAt": "2025-10-28T19:20:34.053Z",
+  "contracts": {
+    "ContestFactory": {
+      "address": "0x3154108A936393086D30C0164E2f1BA26ac0EF3c",
+      "constructorArgs": [
+        "0x9f42Caf52783EF12d8174d33c281a850b8eA58aD"
+      ]
+    },
+    "VotingContract": {
+      "address": "0x298835faF53D6228a8A8758DbDF72249362189c9",
+      "constructorArgs": [
+        "0x3154108A936393086D30C0164E2f1BA26ac0EF3c"
+      ]
+    }
+  }
+}

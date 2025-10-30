@@ -1,0 +1,14 @@
+{
+  "network": "celo-mainnet",
+  "chainId": 42220,
+  "contractName": "OptimizedSimpleBadge",
+  "address": "0xf8CA094fd88F259Df35e0B8a9f38Df8f4F28F336",
+  "deployer": "0x9f42Caf52783EF12d8174d33c281a850b8eA58aD",
+  "deploymentTx": "0xc99c36bb9543f810c9d9b51011968d1ae7faeacce3188c9145698c1633a92397",
+  "blockNumber": 49081886,
+  "gasUsed": "387804",
+  "gasPrice": "25001000000",
+  "deploymentCost": "0.009695487804 CELO",
+  "timestamp": "2025-10-20T17:50:50.523Z",
+  "explorerUrl": "https://celoscan.io/address/0xf8CA094fd88F259Df35e0B8a9f38Df8f4F28F336"
+}
