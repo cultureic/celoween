@@ -67,7 +67,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
     "@sentry/nextjs": "^8.0.0",
-    "@supabase/supabase-js": "^2.57.4",
+    "@supabase/supabase-js": "^2.78.0",
     "@tanstack/react-query": "^5.87.4",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@zerodev/ecdsa-validator": "^5.4.9",

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { wagmiConfig } from '@/lib/wagmi';
 import { ZeroDevSmartWalletProvider } from '@/lib/contexts/ZeroDevSmartWalletProvider';
+import { SupabaseStorageProvider } from '@/lib/contexts/SupabaseStorageContext';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -43,9 +44,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig}>
           <ZeroDevSmartWalletProvider zeroDevProjectId={zeroDevProjectId}>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
+            <SupabaseStorageProvider>
+              <ToastProvider>
+                {children}
+              </ToastProvider>
+            </SupabaseStorageProvider>
           </ZeroDevSmartWalletProvider>
         </WagmiProvider>
       </QueryClientProvider>

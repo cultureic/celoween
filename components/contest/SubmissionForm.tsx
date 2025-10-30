@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import { useSupabaseStorage } from '@/lib/contexts/SupabaseStorageContext';
 
 interface SubmissionFormProps {
   contestId: string;
@@ -11,7 +12,35 @@ interface SubmissionFormProps {
 export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, login } = usePrivy();
+  const { uploadImage, isUploading } = useSupabaseStorage();
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('❌ Please select an image file');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('❌ File size must be less than 5MB');
+        return;
+      }
+      
+      setSelectedFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => setPreviewUrl(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,20 +50,28 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
       return;
     }
 
+    if (!selectedFile) {
+      alert('❌ Please select an image');
+      return;
+    }
+
     setSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      contestId,
-      walletAddress: user.wallet.address,
-      title: formData.get('title'),
-      description: formData.get('description'),
-      mediaUrl: formData.get('imageUrl'),
-      mediaType: 'image',
-      thumbnailUrl: formData.get('imageUrl'),
-    };
-
     try {
+      // Upload image to Supabase
+      const imageUrl = await uploadImage(selectedFile);
+      
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        contestId,
+        walletAddress: user.wallet.address,
+        title: formData.get('title'),
+        description: formData.get('description'),
+        mediaUrl: imageUrl,
+        mediaType: 'image',
+        thumbnailUrl: imageUrl,
+      };
+
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,14 +81,16 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
       if (res.ok) {
         alert('✅ Submission successful!');
         setIsOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl(null);
         if (onSuccess) onSuccess();
         window.location.reload();
       } else {
         const error = await res.json();
         alert(`❌ ${error.error || 'Failed to submit'}`);
       }
-    } catch (error) {
-      alert('❌ Failed to submit');
+    } catch (uploadError) {
+      alert(`❌ Upload failed: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
     } finally {
       setSubmitting(false);
     }
@@ -112,27 +151,58 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
 
           <div>
             <label className="block text-sm font-medium text-spook-300 mb-2">
-              Image URL *
+              Upload Image *
             </label>
-            <input
-              type="url"
-              name="imageUrl"
-              required
-              placeholder="https://example.com/my-costume.jpg"
-              className="w-full px-4 py-3 bg-spook-800 border border-spook-700 rounded-lg text-white placeholder-gray-500 focus:border-spook-orange focus:outline-none"
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              Use a direct image URL (imgur, cloudinary, etc.)
-            </p>
+            <div className="space-y-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full px-4 py-3 bg-spook-800 border border-spook-700 border-dashed rounded-lg text-white hover:border-spook-orange transition-colors focus:outline-none focus:border-spook-orange"
+              >
+                {selectedFile ? selectedFile.name : '📁 Choose Image'}
+              </button>
+              
+              {previewUrl && (
+                <div className="relative">
+                  <img 
+                    src={previewUrl} 
+                    alt="Preview" 
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setPreviewUrl(null);
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                    className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-500">
+                Supported: JPG, PNG, GIF • Max size: 5MB
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || isUploading || !selectedFile}
               className="flex-1 bg-spook-orange hover:bg-spook-orange/80 px-6 py-3 rounded-lg font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              {submitting ? '⏳ Submitting...' : '🎃 Submit Entry'}
+              {isUploading ? '📤 Uploading...' : submitting ? '⏳ Submitting...' : '🎃 Submit Entry'}
             </button>
             <button
               type="button"
