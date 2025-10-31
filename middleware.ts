@@ -301,7 +301,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     // Allow images from common CDNs and YouTube thumbnails used in course previews
     "img-src 'self' data: blob: https://i.postimg.cc https://res.cloudinary.com https://images.unsplash.com https://via.placeholder.com https://img.youtube.com https://i.ytimg.com https://*.supabase.co",
     // Allow on-chain/RPC and auth connections required for web3 + Privy + WalletConnect + Supabase
-    "connect-src 'self' https://auth.privy.io https://api.privy.io wss://relay.walletconnect.com https://rpc.walletconnect.com https://alfajores-forno.celo-testnet.org https://forno.celo.org https://*.celo.org https://*.celoscan.io https://*.supabase.co",
+    "connect-src 'self' https://auth.privy.io https://api.privy.io wss://relay.walletconnect.com https://rpc.walletconnect.com https://alfajores-forno.celo-testnet.org https://forno.celo.org https://*.celo.org https://*.celoscan.io https://*.supabase.co https://*.zerodev.app",
     // Allow embedded frames for Privy and video providers used in course pages
     "frame-src https://auth.privy.io https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
     // Allow media streams if used outside iframes
