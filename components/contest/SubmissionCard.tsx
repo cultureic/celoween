@@ -10,6 +10,8 @@ interface SubmissionCardProps {
   hasVoted?: boolean;
   onVoteClick?: () => void;
   rank?: number;
+  isLoggedIn?: boolean;
+  canVote?: boolean;
 }
 
 export function SubmissionCard({
@@ -22,6 +24,8 @@ export function SubmissionCard({
   hasVoted,
   onVoteClick,
   rank,
+  isLoggedIn = true,
+  canVote = true,
 }: SubmissionCardProps) {
   const getRankEmoji = () => {
     if (!rank) return null;
@@ -97,7 +101,7 @@ export function SubmissionCard({
               : 'bg-spook-violet hover:bg-spook-violet/80 text-white shadow-glow-violet'
           }`}
         >
-          {!onVoteClick ? '🔐 Login to Vote' : hasVoted ? '✅ Voted' : '✨ Vote'}
+          {!isLoggedIn ? '🔐 Login to Vote' : !canVote ? '🔒 Vote Locked' : hasVoted ? '✅ Voted' : '✨ Vote'}
         </button>
       </div>
     </div>

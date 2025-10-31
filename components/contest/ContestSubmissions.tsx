@@ -259,6 +259,9 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
             ? !userVotedSubmissionId || userVotedSubmissionId === submission.id
             : true; // Database mode allows multiple votes
           
+          // Check if user is logged in
+          const isLoggedIn = !!user?.wallet?.address;
+          
           return (
             <SubmissionCard
               key={submission.id}
@@ -269,7 +272,9 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
               voteCount={submission.voteCount}
               mediaUrl={submission.mediaUrl}
               hasVoted={isVoted}
-              onVoteClick={canVote ? () => handleVote(submission.id) : undefined}
+              onVoteClick={canVote && isLoggedIn ? () => handleVote(submission.id) : undefined}
+              isLoggedIn={isLoggedIn}
+              canVote={canVote}
             />
           );
         })}
