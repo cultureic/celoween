@@ -132,6 +132,15 @@ export function SubmissionProvider({
         setSubmissionHash(txHash);
         console.log('[SUBMISSION] ✅ Sponsored submission transaction sent:', txHash);
         
+        // Extract stateTag from metadataURI for database
+        let stateTag = null;
+        try {
+          const metadataObj = JSON.parse(params.metadataURI);
+          stateTag = metadataObj.stateTag || null;
+        } catch (e) {
+          console.warn('[SUBMISSION] Could not parse metadataURI for stateTag:', e);
+        }
+        
         // Save to database WITH the pre-computed onChainId
         const response = await fetch('/api/submissions', {
           method: 'POST',
@@ -146,10 +155,12 @@ export function SubmissionProvider({
             thumbnailUrl: params.mediaUrl,
             transactionHash: txHash,
             onChainId: precomputedSubmissionId,
+            stateTag, // Send stateTag at top level for API to extract
             metadata: JSON.stringify({
               metadataURI: params.metadataURI,
               sponsoredTx: true,
               numericContestId,
+              stateTag, // Also keep in metadata for consistency
             }),
           }),
         });

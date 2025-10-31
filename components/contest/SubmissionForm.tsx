@@ -17,10 +17,13 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
   const [submitting, setSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedStateTag, setSelectedStateTag] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, login } = usePrivy();
   const { uploadImage, isUploading } = useSupabaseStorage();
   const submission = useSubmission();
+  
+  const STATE_TAGS = ['SINALOA', 'MONTERREY', 'CDMX', 'COLOMBIA'];
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -58,6 +61,11 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
       alert('❌ Please select an image');
       return;
     }
+    
+    if (!selectedStateTag) {
+      alert('❌ Please select a state/location tag');
+      return;
+    }
 
     setSubmitting(true);
 
@@ -66,6 +74,7 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
       const formData = new FormData(e.currentTarget);
       const title = formData.get('title') as string;
       const description = formData.get('description') as string;
+      const stateTag = selectedStateTag;
       
       // Upload image to Supabase
       const imageUrl = await uploadImage(selectedFile);
@@ -74,12 +83,13 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
       if (useSmartContract && submission) {
         console.log('[SUBMISSION FORM] Using gasless smart contract submission');
         
-        // Create metadata URI (could be IPFS or JSON string)
+        // Create metadata URI with stateTag
         const metadata = JSON.stringify({
           title,
           description,
           mediaUrl: imageUrl,
           mediaType: 'image',
+          stateTag,
         });
         
         await submission.submitEntry({
@@ -94,10 +104,16 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
         setIsOpen(false);
         setSelectedFile(null);
         setPreviewUrl(null);
+        setSelectedStateTag('');
         if (onSuccess) onSuccess();
         window.location.reload();
       } else {
         console.log('[SUBMISSION FORM] Using database-only submission');
+        
+        // Create metadata with stateTag
+        const metadata = JSON.stringify({
+          stateTag,
+        });
         
         const data = {
           contestId,
@@ -107,6 +123,8 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
           mediaUrl: imageUrl,
           mediaType: 'image',
           thumbnailUrl: imageUrl,
+          metadata,
+          stateTag, // Also send as top-level for API to extract
         };
 
         console.log('Submitting data:', data);
@@ -126,6 +144,7 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
           setIsOpen(false);
           setSelectedFile(null);
           setPreviewUrl(null);
+          setSelectedStateTag('');
           if (onSuccess) onSuccess();
           window.location.reload();
         } else {
@@ -176,7 +195,10 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
             🎃 Submit Your Entry
           </h2>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              setSelectedStateTag('');
+            }}
             className="text-gray-400 hover:text-white text-2xl"
           >
             ×
@@ -208,6 +230,36 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
               placeholder="Describe your costume..."
               className="w-full px-4 py-3 bg-white border border-spook-700 rounded-lg text-black placeholder-gray-500 focus:border-spook-orange focus:outline-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-spook-300 mb-2">
+              State/Location Tag *
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {STATE_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => setSelectedStateTag(tag)}
+                  className={`
+                    px-4 py-3 rounded-lg font-medium transition-all
+                    ${
+                      selectedStateTag === tag
+                        ? 'bg-spook-orange text-white border-2 border-spook-orange'
+                        : 'bg-spook-800 text-white border-2 border-spook-700 hover:border-spook-orange'
+                    }
+                  `}
+                >
+                  📍 {tag}
+                </button>
+              ))}
+            </div>
+            {selectedStateTag && (
+              <p className="text-xs text-spook-400 mt-2">
+                ✓ Selected: {selectedStateTag}
+              </p>
+            )}
           </div>
 
           <div>
@@ -267,7 +319,10 @@ export default function SubmissionForm({ contestId, contestStatus, onSuccess, us
             </button>
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                setSelectedStateTag('');
+              }}
               className="px-6 py-3 bg-spook-800 hover:bg-spook-700 rounded-lg text-white transition-colors"
             >
               Cancel

@@ -12,12 +12,14 @@ interface Submission {
   wallet: string;
   voteCount: number;
   createdAt: string;
+  stateTag: string | null;
 }
 
 export default function SubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [stateFilter, setStateFilter] = useState('all');
   const { user } = usePrivy();
 
   useEffect(() => {
@@ -69,9 +71,17 @@ export default function SubmissionsPage() {
   }
 
   const filteredSubmissions = submissions.filter(sub => {
-    if (filter === 'popular') return sub.voteCount > 10;
-    if (filter === 'recent') return Date.now() - new Date(sub.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000;
-    return true;
+    // Apply popularity/recency filter
+    let matches = true;
+    if (filter === 'popular') matches = matches && sub.voteCount > 10;
+    if (filter === 'recent') matches = matches && Date.now() - new Date(sub.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000;
+    
+    // Apply state filter
+    if (stateFilter !== 'all') {
+      matches = matches && sub.stateTag === stateFilter;
+    }
+    
+    return matches;
   });
 
   if (loading) {
@@ -96,22 +106,44 @@ export default function SubmissionsPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2">
-          {['all', 'popular', 'recent'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`
-                px-4 py-2 rounded-lg font-medium transition-all capitalize
-                ${filter === f
-                  ? 'bg-spook-orange text-spook-950'
-                  : 'bg-spook-800 text-white hover:bg-spook-700'
-                }
-              `}
-            >
-              {f}
-            </button>
-          ))}
+        <div className="flex gap-4">
+          {/* General Filters */}
+          <div className="flex gap-2">
+            {['all', 'popular', 'recent'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`
+                  px-4 py-2 rounded-lg font-medium transition-all capitalize
+                  ${filter === f
+                    ? 'bg-spook-orange text-spook-950'
+                    : 'bg-spook-800 text-white hover:bg-spook-700'
+                  }
+                `}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+          
+          {/* State Filters */}
+          <div className="flex gap-2">
+            {['all', 'SINALOA', 'MONTERREY', 'CDMX', 'COLOMBIA'].map((state) => (
+              <button
+                key={state}
+                onClick={() => setStateFilter(state)}
+                className={`
+                  px-3 py-2 rounded-lg font-medium transition-all text-sm
+                  ${stateFilter === state
+                    ? 'bg-spook-violet text-white'
+                    : 'bg-spook-800/50 text-white hover:bg-spook-700'
+                  }
+                `}
+              >
+                {state}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -152,6 +184,13 @@ export default function SubmissionsPage() {
                     🗳️ {submission.voteCount}
                   </span>
                 </div>
+                
+                {/* State Tag */}
+                {submission.stateTag && (
+                  <div className="inline-block px-2 py-1 bg-spook-violet/20 text-spook-violet rounded text-xs font-medium">
+                    📍 {submission.stateTag}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">

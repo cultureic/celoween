@@ -12,6 +12,7 @@ interface Submission {
   mediaUrl: string;
   voteCount: number;
   onChainId: string | null;
+  stateTag?: string | null; // Extracted from metadata by API
   submitter: {
     walletAddress: string;
   };
@@ -31,6 +32,7 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
   const [userVotedSubmissionId, setUserVotedSubmissionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [previousWallet, setPreviousWallet] = useState<string | undefined>(undefined);
+  const [stateFilter, setStateFilter] = useState<string>('ALL');
 
   // Reset all state when wallet changes
   useEffect(() => {
@@ -44,7 +46,8 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
 
   const fetchSubmissions = useCallback(async () => {
     try {
-      const res = await fetch(`/api/submissions?contestId=${contestId}`);
+      const stateParam = stateFilter !== 'ALL' ? `&stateTag=${stateFilter}` : '';
+      const res = await fetch(`/api/submissions?contestId=${contestId}${stateParam}`);
       const data = await res.json();
       setSubmissions(data.submissions || []);
     } catch (error) {
@@ -52,7 +55,7 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     } finally {
       setLoading(false);
     }
-  }, [contestId]);
+  }, [contestId, stateFilter]);
 
   const fetchUserVotes = useCallback(async () => {
     if (!user?.wallet?.address) return;
@@ -257,11 +260,36 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     );
   }
 
+  const STATE_TAGS = ['ALL', 'SINALOA', 'MONTERREY', 'CDMX', 'COLOMBIA'];
+
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-4">
-        Submissions ({submissions.length})
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-white">
+          Submissions ({submissions.length})
+        </h2>
+        
+        {/* State Filter */}
+        <div className="flex gap-2">
+          {STATE_TAGS.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => setStateFilter(tag)}
+              className={`
+                px-4 py-2 rounded-lg font-medium transition-all text-sm
+                ${
+                  stateFilter === tag
+                    ? 'bg-spook-orange text-spook-950'
+                    : 'bg-spook-800 text-white hover:bg-spook-700'
+                }
+              `}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {submissions.map((submission) => {
           const isVoted = useSmartContract ? userVotedSubmissionId === submission.id : userVotes.has(submission.id);

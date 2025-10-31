@@ -73,6 +73,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Parse and enhance metadata with stateTag
+    let metadataObj = {};
+    try {
+      metadataObj = metadata ? JSON.parse(metadata) : {};
+    } catch {
+      metadataObj = {};
+    }
+    
+    // Add stateTag to metadata from body (required field, no default)
+    if (body.stateTag) {
+      metadataObj.stateTag = body.stateTag;
+    }
+    
     // Create submission
     const submission = await prisma.submission.create({
       data: {
@@ -83,7 +96,7 @@ export async function POST(request: NextRequest) {
         mediaUrl,
         mediaType,
         thumbnailUrl,
-        metadata,
+        metadata: JSON.stringify(metadataObj),
         transactionHash,
         onChainId,
       },
@@ -115,12 +128,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/submissions?contestId=xxx - Get submissions for a contest
+// GET /api/submissions?contestId=xxx&stateTag=xxx - Get submissions for a contest
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const contestId = searchParams.get('contestId');
     const walletAddress = searchParams.get('walletAddress');
+    const stateTag = searchParams.get('stateTag');
 
     if (!contestId && !walletAddress) {
       return NextResponse.json(
@@ -129,7 +143,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const submissions = await prisma.submission.findMany({
+    let submissions = await prisma.submission.findMany({
       where: {
         ...(contestId && { contestId }),
         ...(walletAddress && { submitterAddress: walletAddress }),
@@ -160,8 +174,30 @@ export async function GET(request: NextRequest) {
         voteCount: 'desc',
       },
     });
+    
+    // Filter by stateTag if provided (filter in JS since it's in JSON metadata)
+    if (stateTag) {
+      submissions = submissions.filter(sub => {
+        try {
+          const meta = sub.metadata ? JSON.parse(sub.metadata as string) : {};
+          return meta.stateTag === stateTag;
+        } catch {
+          return false;
+        }
+      });
+    }
+    
+    // Parse metadata for each submission to extract stateTag
+    const submissionsWithStateTag = submissions.map(sub => {
+      let stateTag = null;
+      try {
+        const meta = sub.metadata ? JSON.parse(sub.metadata as string) : {};
+        stateTag = meta.stateTag || null;
+      } catch {}
+      return { ...sub, stateTag };
+    });
 
-    return NextResponse.json({ submissions });
+    return NextResponse.json({ submissions: submissionsWithStateTag });
   } catch (error) {
     console.error('Error fetching submissions:', error);
     return NextResponse.json(

@@ -19,6 +19,8 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "node prisma/seed.js",
     "prisma:reset": "prisma migrate reset --force --skip-seed",
+    "update:state-tags": "node scripts/update-state-tags.mjs",
+    "fix:metadata-format": "node scripts/fix-metadata-format.mjs",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --watchAll=false",
