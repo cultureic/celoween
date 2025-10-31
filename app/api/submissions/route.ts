@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse and enhance metadata with stateTag
-    let metadataObj = {};
+    let metadataObj: any = {};
     try {
       metadataObj = metadata ? JSON.parse(metadata) : {};
     } catch {
