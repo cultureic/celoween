@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import { SubmissionCard } from './SubmissionCard';
 import { useVoting } from '@/lib/contexts/VotingProvider';
@@ -31,7 +31,7 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
   const [userVotedSubmissionId, setUserVotedSubmissionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     try {
       const res = await fetch(`/api/submissions?contestId=${contestId}`);
       const data = await res.json();
@@ -41,9 +41,9 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     } finally {
       setLoading(false);
     }
-  };
+  }, [contestId]);
 
-  const fetchUserVotes = async () => {
+  const fetchUserVotes = useCallback(async () => {
     if (!user?.wallet?.address) return;
     
     try {
@@ -56,9 +56,9 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     } catch (error) {
       console.error('Failed to fetch user votes:', error);
     }
-  };
+  }, [user?.wallet?.address]);
   
-  const fetchOnChainVote = async () => {
+  const fetchOnChainVote = useCallback(async () => {
     if (!voting || !useSmartContract) return;
     
     // Use smart account address if available, otherwise EOA
@@ -86,20 +86,20 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     } catch (error) {
       console.error('Failed to fetch on-chain vote:', error);
     }
-  };
+  }, [voting, useSmartContract, user?.wallet?.address, contestId, submissions]);
 
   useEffect(() => {
     fetchSubmissions();
     if (user?.wallet?.address) {
       fetchUserVotes();
     }
-  }, [contestId, user?.wallet?.address]);
+  }, [contestId, user?.wallet?.address, fetchSubmissions, fetchUserVotes]);
   
   useEffect(() => {
     if (useSmartContract && voting && user?.wallet?.address && submissions.length > 0) {
       fetchOnChainVote();
     }
-  }, [useSmartContract, voting, user?.wallet?.address, submissions.length]);
+  }, [useSmartContract, voting, user?.wallet?.address, submissions.length, fetchOnChainVote]);
 
   async function handleVote(submissionId: string) {
     if (!user?.wallet?.address) {
@@ -128,7 +128,7 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
         
         if (onChainId) {
           // Ensure it's a hex string (convert BigInt if needed)
-          const hexId = typeof onChainId === 'bigint' ? `0x${onChainId.toString(16)}` : onChainId;
+          const hexId = typeof onChainId === 'bigint' ? `0x${(onChainId as bigint).toString(16)}` : onChainId;
           submission.onChainId = hexId;
           console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', hexId);
         } else {
