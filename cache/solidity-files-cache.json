@@ -275,8 +275,8 @@
       ]
     },
     "/Users/cesarangulo/Documents/celo-academy/celoween/contracts/SimpleVoting.sol": {
-      "lastModificationDate": 1761896743656,
-      "contentHash": "52127a804986e86ff926c2066603092a",
+      "lastModificationDate": 1761901238202,
+      "contentHash": "ecff2758b2931a9ab9c88b92f8cb66b6",
       "sourceName": "contracts/SimpleVoting.sol",
       "solcConfig": {
         "version": "0.8.20",

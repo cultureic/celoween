@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 contract SimpleVoting is Ownable, ReentrancyGuard {
     
     struct Submission {
-        uint256 id;
+        bytes32 id;  // Changed to bytes32 hash
         uint256 contestId;
         address submitter;
         string metadataURI;
@@ -20,33 +20,30 @@ contract SimpleVoting is Ownable, ReentrancyGuard {
         bool exists;
     }
     
-    // State variables
-    uint256 private _submissionIdCounter = 1; // Start at 1 to avoid 0 (which means no submission)
-    
     // Mappings
-    mapping(uint256 => Submission) public submissions;
-    mapping(uint256 => uint256[]) public contestSubmissions; // contestId => submissionIds
-    mapping(uint256 => mapping(address => uint256)) public userSubmission; // contestId => user => submissionId
-    mapping(uint256 => mapping(address => bool)) public hasVoted; // submissionId => voter => bool
-    mapping(uint256 => address[]) public submissionVoters; // submissionId => voters
-    mapping(uint256 => mapping(address => uint256)) public userVote; // contestId => user => submissionId voted for
+    mapping(bytes32 => Submission) public submissions;  // hash => Submission
+    mapping(uint256 => bytes32[]) public contestSubmissions; // contestId => submission hashes
+    mapping(uint256 => mapping(address => bytes32)) public userSubmission; // contestId => user => submission hash
+    mapping(bytes32 => mapping(address => bool)) public hasVoted; // submission hash => voter => bool
+    mapping(bytes32 => address[]) public submissionVoters; // submission hash => voters
+    mapping(uint256 => mapping(address => bytes32)) public userVote; // contestId => user => submission hash voted for
     
     // Events
     event SubmissionCreated(
-        uint256 indexed submissionId,
+        bytes32 indexed submissionId,
         uint256 indexed contestId,
         address indexed submitter,
         string metadataURI
     );
     
     event VoteCast(
-        uint256 indexed submissionId,
+        bytes32 indexed submissionId,
         uint256 indexed contestId,
         address indexed voter
     );
     
     event VoteRemoved(
-        uint256 indexed submissionId,
+        bytes32 indexed submissionId,
         uint256 indexed contestId,
         address indexed voter
     );
@@ -55,14 +52,16 @@ contract SimpleVoting is Ownable, ReentrancyGuard {
     
     /**
      * @dev Submit an entry to a contest
+     * @dev Uses deterministic hash: keccak256(contestId, submitter) for ID
      */
     function submitEntry(
         uint256 _contestId,
         string memory _metadataURI
-    ) external nonReentrant returns (uint256) {
-        require(userSubmission[_contestId][msg.sender] == 0, "Already submitted to this contest");
+    ) external nonReentrant returns (bytes32) {
+        require(userSubmission[_contestId][msg.sender] == bytes32(0), "Already submitted to this contest");
         
-        uint256 submissionId = _submissionIdCounter++;
+        // Generate deterministic submission ID
+        bytes32 submissionId = keccak256(abi.encodePacked(_contestId, msg.sender));
         
         submissions[submissionId] = Submission({
             id: submissionId,
@@ -85,16 +84,16 @@ contract SimpleVoting is Ownable, ReentrancyGuard {
     /**
      * @dev Cast a vote for a submission
      */
-    function vote(uint256 _submissionId) external nonReentrant {
+    function vote(bytes32 _submissionId) external nonReentrant {
         Submission storage submission = submissions[_submissionId];
         require(submission.exists, "Submission does not exist");
         require(submission.submitter != msg.sender, "Cannot vote for own submission");
         
         uint256 contestId = submission.contestId;
-        uint256 existingVote = userVote[contestId][msg.sender];
+        bytes32 existingVote = userVote[contestId][msg.sender];
         
         // If user already voted in this contest, remove old vote first
-        if (existingVote != 0 && hasVoted[existingVote][msg.sender]) {
+        if (existingVote != bytes32(0) && hasVoted[existingVote][msg.sender]) {
             Submission storage oldSubmission = submissions[existingVote];
             hasVoted[existingVote][msg.sender] = false;
             oldSubmission.voteCount--;
@@ -124,7 +123,7 @@ contract SimpleVoting is Ownable, ReentrancyGuard {
     /**
      * @dev Remove a vote
      */
-    function removeVote(uint256 _submissionId) external nonReentrant {
+    function removeVote(bytes32 _submissionId) external nonReentrant {
         Submission storage submission = submissions[_submissionId];
         require(submission.exists, "Submission does not exist");
         require(hasVoted[_submissionId][msg.sender], "Haven't voted yet");
@@ -133,7 +132,7 @@ contract SimpleVoting is Ownable, ReentrancyGuard {
         
         hasVoted[_submissionId][msg.sender] = false;
         submission.voteCount--;
-        userVote[contestId][msg.sender] = 0;
+        userVote[contestId][msg.sender] = bytes32(0);
         
         address[] storage voters = submissionVoters[_submissionId];
         for (uint256 i = 0; i < voters.length; i++) {
@@ -150,42 +149,42 @@ contract SimpleVoting is Ownable, ReentrancyGuard {
     /**
      * @dev Get submission details
      */
-    function getSubmission(uint256 _submissionId) external view returns (Submission memory) {
+    function getSubmission(bytes32 _submissionId) external view returns (Submission memory) {
         return submissions[_submissionId];
     }
     
     /**
      * @dev Get all submissions for a contest
      */
-    function getContestSubmissions(uint256 _contestId) external view returns (uint256[] memory) {
+    function getContestSubmissions(uint256 _contestId) external view returns (bytes32[] memory) {
         return contestSubmissions[_contestId];
     }
     
     /**
      * @dev Get user's submission for a contest
      */
-    function getUserSubmission(uint256 _contestId, address _user) external view returns (uint256) {
+    function getUserSubmission(uint256 _contestId, address _user) external view returns (bytes32) {
         return userSubmission[_contestId][_user];
-    }
-    
-    /**
-     * @dev Get total submissions count
-     */
-    function getTotalSubmissions() external view returns (uint256) {
-        return _submissionIdCounter;
     }
     
     /**
      * @dev Check if user has voted for a submission
      */
-    function hasUserVoted(uint256 _submissionId, address _user) external view returns (bool) {
+    function hasUserVoted(bytes32 _submissionId, address _user) external view returns (bool) {
         return hasVoted[_submissionId][_user];
     }
     
     /**
-     * @dev Get which submission a user voted for in a contest (0 if no vote)
+     * @dev Get which submission a user voted for in a contest (bytes32(0) if no vote)
      */
-    function getUserVoteInContest(uint256 _contestId, address _user) external view returns (uint256) {
+    function getUserVoteInContest(uint256 _contestId, address _user) external view returns (bytes32) {
         return userVote[_contestId][_user];
+    }
+    
+    /**
+     * @dev Helper to compute submission ID for a given contest and submitter
+     */
+    function computeSubmissionId(uint256 _contestId, address _submitter) external pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_contestId, _submitter));
     }
 }
