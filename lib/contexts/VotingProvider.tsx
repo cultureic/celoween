@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useSmartAccount } from '@/lib/contexts/ZeroDevSmartWalletProvider';
 import { encodeFunctionData } from 'viem';
 import { usePrivy } from '@privy-io/react-auth';
-import type { Address } from 'viem';
+import type { Address, Abi } from 'viem';
 
 // Convert string ID to consistent numeric ID for smart contract
 function hashStringToNumber(str: string): number {
@@ -36,7 +36,7 @@ const VotingContext = createContext<VotingState | null>(null);
 interface VotingProviderProps {
   children: ReactNode;
   votingContractAddress: Address;
-  votingContractAbi: any[];
+  votingContractAbi: Abi;
 }
 
 export function VotingProvider({
@@ -302,7 +302,7 @@ export function VotingProvider({
     removeVote,
     getUserVoteInContest,
     getUserSubmissionId,
-    smartAccountAddress: smartAccount.smartAccountAddress,
+    smartAccountAddress: smartAccount.smartAccountAddress ?? undefined,
     canSponsorTransaction: smartAccount.canSponsorTransaction,
   };
 

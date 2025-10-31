@@ -166,12 +166,12 @@ export function SubmissionProvider({
             transport: http(),
           });
           
-          const submissionIdFromContract = await readContract(publicClient, {
+          const submissionIdFromContract = (await readContract(publicClient, {
             address: votingContractAddress,
             abi: votingContractAbi,
             functionName: 'getUserSubmission',
             args: [BigInt(numericContestId), accountAddress as `0x${string}`],
-          }) as bigint;
+          }))[0] as bigint;
           
           if (submissionIdFromContract > 0n) {
             const onChainId = submissionIdFromContract.toString();

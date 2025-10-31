@@ -19,7 +19,7 @@ export default function SubmissionForm({ contestId, onSuccess, useSmartContract 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, login } = usePrivy();
   const { uploadImage, isUploading } = useSupabaseStorage();
-  const submission = useSmartContract ? useSubmission() : null;
+  const submission = useSubmission();
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

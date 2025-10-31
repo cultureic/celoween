@@ -32,8 +32,8 @@ export function ContestSubmissionsWrapper({ contestId, contestStatus }: ContestS
   }
   
   return (
-    <VotingProvider votingContractAddress={address} votingContractAbi={abi}>
-      <SubmissionProvider votingContractAddress={address} votingContractAbi={abi}>
+    <VotingProvider votingContractAddress={address} votingContractAbi={abi as any}>
+      <SubmissionProvider votingContractAddress={address} votingContractAbi={abi as any}>
         <div>
           <div className="flex justify-center mb-8">
             <SubmissionForm contestId={contestId} useSmartContract={true} />

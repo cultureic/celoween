@@ -25,26 +25,13 @@ interface ContestSubmissionsProps {
 
 export function ContestSubmissions({ contestId, contestStatus, useSmartContract }: ContestSubmissionsProps) {
   const { user, login } = usePrivy();
-  const voting = useSmartContract ? useVoting() : null;
+  const voting = useVoting();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [userVotes, setUserVotes] = useState<Set<string>>(new Set());
   const [userVotedSubmissionId, setUserVotedSubmissionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSubmissions();
-    if (user?.wallet?.address) {
-      fetchUserVotes();
-    }
-  }, [contestId, user?.wallet?.address]);
-  
-  useEffect(() => {
-    if (useSmartContract && voting && user?.wallet?.address && submissions.length > 0) {
-      fetchOnChainVote();
-    }
-  }, [useSmartContract, voting, user?.wallet?.address, submissions]);
-
-  async function fetchSubmissions() {
+  const fetchSubmissions = async () => {
     try {
       const res = await fetch(`/api/submissions?contestId=${contestId}`);
       const data = await res.json();
@@ -54,25 +41,25 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  async function fetchUserVotes() {
+  const fetchUserVotes = async () => {
     if (!user?.wallet?.address) return;
     
     try {
       const res = await fetch(`/api/votes?walletAddress=${user.wallet.address}`);
-      const data = await res.json();
+      const data: { votes?: { submissionId: string }[] } = await res.json();
       const votedSubmissionIds = new Set(
-        data.votes?.map((vote: any) => vote.submissionId) || []
+        data.votes?.map((vote: { submissionId: string }) => vote.submissionId) || []
       );
       setUserVotes(votedSubmissionIds);
     } catch (error) {
       console.error('Failed to fetch user votes:', error);
     }
-  }
+  };
   
-  async function fetchOnChainVote() {
-    if (!voting) return;
+  const fetchOnChainVote = async () => {
+    if (!voting || !useSmartContract) return;
     
     // Use smart account address if available, otherwise EOA
     const address = voting.smartAccountAddress || user?.wallet?.address;
@@ -99,7 +86,20 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     } catch (error) {
       console.error('Failed to fetch on-chain vote:', error);
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchSubmissions();
+    if (user?.wallet?.address) {
+      fetchUserVotes();
+    }
+  }, [contestId, user?.wallet?.address]);
+  
+  useEffect(() => {
+    if (useSmartContract && voting && user?.wallet?.address && submissions.length > 0) {
+      fetchOnChainVote();
+    }
+  }, [useSmartContract, voting, user?.wallet?.address, submissions.length]);
 
   async function handleVote(submissionId: string) {
     if (!user?.wallet?.address) {
