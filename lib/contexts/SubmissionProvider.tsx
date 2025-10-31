@@ -90,9 +90,21 @@ export function SubmissionProvider({
     
     try {
       // Convert contestId string to numeric ID for smart contract
-      // Use a simple hash function to create consistent numeric IDs from UUIDs
       const numericContestId = hashStringToNumber(params.contestId);
       console.log('[SUBMISSION] Converted contest ID:', params.contestId, '→', numericContestId);
+      
+      // Pre-compute the submission ID that will be created
+      const accountAddress = smartAccount.smartAccountAddress || userAddress;
+      if (!accountAddress) {
+        throw new Error('No account address available');
+      }
+      
+      const { keccak256, encodePacked } = await import('viem');
+      const precomputedSubmissionId = keccak256(
+        encodePacked(['uint256', 'address'], [BigInt(numericContestId), accountAddress as `0x${string}`])
+      );
+      
+      console.log('[SUBMISSION] Pre-computed submission ID:', precomputedSubmissionId);
       
       // Encode the submitEntry function call
       const encodedData = encodeFunctionData({
@@ -105,7 +117,8 @@ export function SubmissionProvider({
         contract: votingContractAddress,
         contestId: params.contestId,
         metadataURI: params.metadataURI,
-        smartAccount: smartAccount.smartAccountAddress,
+        smartAccount: accountAddress,
+        precomputedId: precomputedSubmissionId,
       });
       
       // Execute sponsored transaction through ZeroDev
@@ -119,9 +132,7 @@ export function SubmissionProvider({
         setSubmissionHash(txHash);
         console.log('[SUBMISSION] ✅ Sponsored submission transaction sent:', txHash);
         
-        // Save to database first without onChainId
-        const accountAddress = smartAccount.smartAccountAddress || userAddress;
-        
+        // Save to database WITH the pre-computed onChainId
         const response = await fetch('/api/submissions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -134,7 +145,7 @@ export function SubmissionProvider({
             mediaType: 'image',
             thumbnailUrl: params.mediaUrl,
             transactionHash: txHash,
-            onChainId: null,
+            onChainId: precomputedSubmissionId,
             metadata: JSON.stringify({
               metadataURI: params.metadataURI,
               sponsoredTx: true,
@@ -151,44 +162,10 @@ export function SubmissionProvider({
         
         const data = await response.json();
         const submissionDbId = data.submission?.id;
-        console.log('[SUBMISSION] ✅ Submission saved to database:', submissionDbId);
+        console.log('[SUBMISSION] ✅ Submission saved to database with pre-computed ID:', submissionDbId, precomputedSubmissionId);
         
-        // Wait and query on-chain ID synchronously
-        try {
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          
-          const { createPublicClient, http } = await import('viem');
-          const { celo } = await import('viem/chains');
-          const { readContract } = await import('viem/actions');
-          
-          const publicClient = createPublicClient({
-            chain: celo,
-            transport: http(),
-          });
-          
-          const submissionIdFromContract = (await readContract(publicClient, {
-            address: votingContractAddress,
-            abi: votingContractAbi,
-            functionName: 'getUserSubmission',
-            args: [BigInt(numericContestId), accountAddress as `0x${string}`],
-          }) as unknown) as `0x${string}`;
-          
-          // Check if not zero hash
-          if (submissionIdFromContract && submissionIdFromContract !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-            const onChainId = submissionIdFromContract; // Already a hex string
-            console.log('[SUBMISSION] ✅ Got on-chain ID from contract:', onChainId);
-            
-            await fetch(`/api/submissions/${submissionDbId}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ onChainId }),
-            });
-          }
-        } catch (error) {
-          console.error('[SUBMISSION] ⚠️ Could not fetch on-chain ID:', error);
-        } finally {
-          setIsConfirmingSubmission(false);
-        }
+        // No need to query on-chain ID since we pre-computed it
+        setIsConfirmingSubmission(false);
         
         return submissionDbId;
       }
