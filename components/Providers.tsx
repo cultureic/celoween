@@ -5,13 +5,21 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { celo } from 'viem/chains';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { wagmiConfig } from '@/lib/wagmi';
 import { ZeroDevSmartWalletProvider } from '@/lib/contexts/ZeroDevSmartWalletProvider';
 import { SupabaseStorageProvider } from '@/lib/contexts/SupabaseStorageContext';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
+  const [isInFarcaster, setIsInFarcaster] = useState(false);
+
+  // Check if running in Farcaster context
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).sdk) {
+      setIsInFarcaster(true);
+    }
+  }, []);
 
   // Privy configuration (following Motus pattern)
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
@@ -26,11 +34,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       appId={appId}
       clientId={clientId}
       config={{
-        loginMethods: ['wallet', 'email', 'farcaster'],
+        loginMethods: isInFarcaster ? ['farcaster'] : ['wallet', 'email', 'farcaster'],
         appearance: {
           theme: 'light',
           accentColor: '#FCFF52',
-          walletList: ['metamask', 'detected_wallets'],
+          walletList: isInFarcaster ? [] : ['metamask', 'detected_wallets'],
           showWalletLoginFirst: false,
         },
         embeddedWallets: {
