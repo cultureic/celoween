@@ -127,8 +127,10 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
         console.log('[CONTEST SUBMISSIONS] Contract returned onChainId:', onChainId);
         
         if (onChainId) {
-          submission.onChainId = onChainId;
-          console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', onChainId);
+          // Ensure it's a hex string (convert BigInt if needed)
+          const hexId = typeof onChainId === 'bigint' ? `0x${onChainId.toString(16)}` : onChainId;
+          submission.onChainId = hexId;
+          console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', hexId);
         } else {
           console.error('[CONTEST SUBMISSIONS] No on-chain submission found for this user');
         }
