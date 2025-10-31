@@ -11,12 +11,12 @@ The Celoween app now works as both a regular web app AND a Farcaster mini app, a
 - Privy handles all the authentication automatically
 
 ### 2. Farcaster Manifest
-- Created `/api/farcaster-manifest.json` endpoint
+- Created `/.well-known/farcaster.json` endpoint
 - Tells Farcaster clients about your app:
   - App name: "Celoween Halloween Contest"
-  - Home URL: Your deployed app
-  - Icon and splash screen
-  - Theme color: #1a0b2e (spooky purple)
+  - Description and icons
+  - Developer FID (configure via env var)
+  - Theme color: #ff6b35 (spooky orange)
 
 ## How It Works
 
@@ -44,18 +44,24 @@ When users log in via Farcaster:
 ### 1. Configure Privy
 Make sure your Privy dashboard has Farcaster login enabled.
 
-### 2. Deploy
-The manifest endpoint needs to be publicly accessible:
-```
-https://your-app.vercel.app/api/farcaster-manifest.json
+### 2. Set Developer FID
+Add your Farcaster FID to environment variables:
+```env
+FARCASTER_DEVELOPER_FID=your_fid_here
 ```
 
-### 3. Register on Farcaster
+### 3. Deploy
+The manifest endpoint needs to be publicly accessible:
+```
+https://your-app.vercel.app/.well-known/farcaster.json
+```
+
+### 4. Register on Farcaster
 - Go to Warpcast developer portal
 - Register your app with the manifest URL
 - Get approved for mini app status
 
-### 4. Test
+### 5. Test
 - Share your app URL in Warpcast
 - It should open as a mini app
 - Users can interact without leaving Farcaster
