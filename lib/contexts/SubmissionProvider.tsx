@@ -166,12 +166,12 @@ export function SubmissionProvider({
             transport: http(),
           });
           
-          const submissionIdFromContract = await readContract(publicClient, {
+          const submissionIdFromContract = (await readContract(publicClient, {
             address: votingContractAddress,
             abi: votingContractAbi,
             functionName: 'getUserSubmission',
             args: [BigInt(numericContestId), accountAddress as `0x${string}`],
-          }) as `0x${string}`;
+          }) as unknown) as `0x${string}`;
           
           // Check if not zero hash
           if (submissionIdFromContract && submissionIdFromContract !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
