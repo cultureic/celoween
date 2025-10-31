@@ -41,12 +41,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           walletList: isInFarcaster ? [] : ['metamask', 'detected_wallets'],
           showWalletLoginFirst: false,
         },
-        embeddedWallets: {
+        embeddedWallets: isInFarcaster ? {
+          createOnLogin: 'off',
+        } : {
           createOnLogin: 'users-without-wallets',
           requireUserPasswordOnCreate: false,
         },
-        defaultChain: celo, // Celo Mainnet
-        supportedChains: [celo], // Only mainnet supported
+        defaultChain: celo,
+        supportedChains: [celo],
       }}
     >
       <QueryClientProvider client={queryClient}>

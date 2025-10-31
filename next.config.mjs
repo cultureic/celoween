@@ -6,6 +6,10 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
+            key: 'X-Frame-Options',
+            value: 'ALLOWALL', // Override middleware's DENY
+          },
+          {
             key: 'Content-Security-Policy',
             value: "frame-ancestors 'self' https://*.warpcast.com https://warpcast.com https://*.farcaster.xyz https://farcaster.xyz",
           },
