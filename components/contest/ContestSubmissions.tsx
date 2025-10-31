@@ -138,9 +138,9 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
           // Convert to hex string if it's a BigInt
           let hexId: string;
           if (typeof onChainId === 'bigint') {
-            hexId = `0x${onChainId.toString(16).padStart(64, '0')}`;
+            hexId = `0x${(onChainId as bigint).toString(16).padStart(64, '0')}`;
           } else {
-            hexId = onChainId;
+            hexId = onChainId as string;
           }
           submission.onChainId = hexId;
           console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', hexId);
