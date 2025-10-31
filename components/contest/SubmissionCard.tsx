@@ -97,7 +97,7 @@ export function SubmissionCard({
               : 'bg-spook-violet hover:bg-spook-violet/80 text-white shadow-glow-violet'
           }`}
         >
-          {!onVoteClick ? '🔒 Locked' : hasVoted ? '✅ Voted' : '✨ Vote'}
+          {!onVoteClick ? '🔐 Login to Vote' : hasVoted ? '✅ Voted' : '✨ Vote'}
         </button>
       </div>
     </div>

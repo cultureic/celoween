@@ -141,10 +141,16 @@ export default function SubmissionForm({ contestId, onSuccess, useSmartContract 
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          if (!user?.wallet?.address) {
+            login();
+            return;
+          }
+          setIsOpen(true);
+        }}
         className="bg-spook-orange hover:bg-spook-orange/80 px-8 py-4 rounded-xl font-semibold text-lg shadow-glow-orange transition-all"
       >
-        🎤 Submit Entry
+        {!user?.wallet?.address ? '🔐 Login to Submit' : '🎤 Submit Entry'}
       </button>
     );
   }

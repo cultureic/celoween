@@ -103,6 +103,7 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
 
   async function handleVote(submissionId: string) {
     if (!user?.wallet?.address) {
+      alert('⚠️ Please login to vote');
       login();
       return;
     }
