@@ -166,16 +166,17 @@ export function SubmissionProvider({
             transport: http(),
           });
           
-          const submissionIdFromContract = (await readContract(publicClient, {
+          const submissionIdFromContract = await readContract(publicClient, {
             address: votingContractAddress,
             abi: votingContractAbi,
             functionName: 'getUserSubmission',
             args: [BigInt(numericContestId), accountAddress as `0x${string}`],
-          }))[0] as bigint;
+          }) as `0x${string}`;
           
-          if (submissionIdFromContract > 0n) {
-            const onChainId = submissionIdFromContract.toString();
-            console.log('[SUBMISSION] ✅ Got on-chain ID, updating database:', onChainId);
+          // Check if not zero hash
+          if (submissionIdFromContract && submissionIdFromContract !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+            const onChainId = submissionIdFromContract; // Already a hex string
+            console.log('[SUBMISSION] ✅ Got on-chain ID from contract:', onChainId);
             
             await fetch(`/api/submissions/${submissionDbId}`, {
               method: 'PATCH',
