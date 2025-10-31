@@ -26,7 +26,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       appId={appId}
       clientId={clientId}
       config={{
-        loginMethods: ['wallet', 'email'],
+        loginMethods: ['wallet', 'email', 'farcaster'],
         appearance: {
           theme: 'light',
           accentColor: '#FCFF52',
