@@ -3,13 +3,15 @@
 import { useState, useRef } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import { useSupabaseStorage } from '@/lib/contexts/SupabaseStorageContext';
+import { useSubmission } from '@/lib/contexts/SubmissionProvider';
 
 interface SubmissionFormProps {
   contestId: string;
   onSuccess?: () => void;
+  useSmartContract?: boolean;
 }
 
-export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormProps) {
+export default function SubmissionForm({ contestId, onSuccess, useSmartContract = false }: SubmissionFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -17,6 +19,7 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, login } = usePrivy();
   const { uploadImage, isUploading } = useSupabaseStorage();
+  const submission = useSmartContract ? useSubmission() : null;
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -58,27 +61,34 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
     setSubmitting(true);
 
     try {
+      // Get form data first
+      const formData = new FormData(e.currentTarget);
+      const title = formData.get('title') as string;
+      const description = formData.get('description') as string;
+      
       // Upload image to Supabase
       const imageUrl = await uploadImage(selectedFile);
       
-      const formData = new FormData(e.currentTarget);
-      const data = {
-        contestId,
-        walletAddress: user.wallet.address,
-        title: formData.get('title'),
-        description: formData.get('description'),
-        mediaUrl: imageUrl,
-        mediaType: 'image',
-        thumbnailUrl: imageUrl,
-      };
-
-      const res = await fetch('/api/submissions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      if (res.ok) {
+      // Use smart contract submission if available
+      if (useSmartContract && submission) {
+        console.log('[SUBMISSION FORM] Using gasless smart contract submission');
+        
+        // Create metadata URI (could be IPFS or JSON string)
+        const metadata = JSON.stringify({
+          title,
+          description,
+          mediaUrl: imageUrl,
+          mediaType: 'image',
+        });
+        
+        await submission.submitEntry({
+          contestId,
+          title,
+          description,
+          mediaUrl: imageUrl,
+          metadataURI: metadata,
+        });
+        
         alert('✅ Submission successful!');
         setIsOpen(false);
         setSelectedFile(null);
@@ -86,8 +96,40 @@ export default function SubmissionForm({ contestId, onSuccess }: SubmissionFormP
         if (onSuccess) onSuccess();
         window.location.reload();
       } else {
-        const error = await res.json();
-        alert(`❌ ${error.error || 'Failed to submit'}`);
+        console.log('[SUBMISSION FORM] Using database-only submission');
+        
+        const data = {
+          contestId,
+          walletAddress: user.wallet.address,
+          title,
+          description,
+          mediaUrl: imageUrl,
+          mediaType: 'image',
+          thumbnailUrl: imageUrl,
+        };
+
+        console.log('Submitting data:', data);
+        
+        const res = await fetch('/api/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        console.log('Response status:', res.status);
+        const responseData = await res.json();
+        console.log('Response data:', responseData);
+
+        if (res.ok) {
+          alert('✅ Submission successful!');
+          setIsOpen(false);
+          setSelectedFile(null);
+          setPreviewUrl(null);
+          if (onSuccess) onSuccess();
+          window.location.reload();
+        } else {
+          alert(`❌ ${responseData.error || 'Failed to submit'}`);
+        }
       }
     } catch (uploadError) {
       alert(`❌ Upload failed: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);

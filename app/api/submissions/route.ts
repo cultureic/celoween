@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
       mediaType,
       thumbnailUrl,
       metadata,
+      transactionHash,
+      onChainId,
     } = body;
 
     // Validate required fields
@@ -82,6 +84,8 @@ export async function POST(request: NextRequest) {
         mediaType,
         thumbnailUrl,
         metadata,
+        transactionHash,
+        onChainId,
       },
       include: {
         submitter: {

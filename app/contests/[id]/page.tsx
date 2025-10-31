@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import SubmissionForm from '@/components/contest/SubmissionForm';
+import { ContestSubmissionsWrapper } from '@/components/contest/ContestSubmissionsWrapper';
 
 async function getContestData(id: string) {
   const contest = await prisma.contest.findUnique({
@@ -96,53 +97,12 @@ export default async function ContestDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
-          <div className="flex justify-center mb-8">
-            <SubmissionForm contestId={contest.id} />
-          </div>
+          {/* SubmissionForm will be wrapped with provider in wrapper */}
 
-          {contest.submissions.length === 0 ? (
-            <div className="text-center py-12 bg-spook-bg/30 rounded-xl">
-              <div className="text-6xl mb-4">🎭</div>
-              <h3 className="text-2xl font-creepster text-spook-orange mb-2">
-                No submissions yet
-              </h3>
-              <p className="text-gray-400">
-                Be the first to submit to this contest!
-              </p>
-            </div>
-          ) : (
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Submissions ({contest.submissions.length})
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {contest.submissions.map((submission) => (
-                  <div key={submission.id} className="bg-spook-bg rounded-xl overflow-hidden border border-spook-700">
-                    {submission.mediaUrl && (
-                      <img 
-                        src={submission.mediaUrl} 
-                        alt={submission.description || submission.title || 'Submission'} 
-                        className="w-full h-64 object-cover"
-                      />
-                    )}
-                    <div className="p-4">
-                      <p className="text-sm text-gray-300 mb-2">
-                        {submission.description || submission.title}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
-                          {submission.submitter.walletAddress.slice(0, 6)}...
-                        </span>
-                        <span className="text-spook-orange font-bold">
-                          🗳️ {submission._count.votes}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <ContestSubmissionsWrapper 
+            contestId={contest.id} 
+            contestStatus={contest.status}
+          />
         </div>
       </div>
     </div>

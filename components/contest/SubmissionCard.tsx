@@ -8,7 +8,7 @@ interface SubmissionCardProps {
   voteCount: number;
   mediaUrl?: string;
   hasVoted?: boolean;
-  onVoteClick: () => void;
+  onVoteClick?: () => void;
   rank?: number;
 }
 
@@ -88,13 +88,16 @@ export function SubmissionCard({
         {/* Vote button */}
         <button
           onClick={onVoteClick}
+          disabled={!onVoteClick}
           className={`w-full py-3 rounded-xl font-semibold transition-all ${
-            hasVoted
-              ? 'bg-gray-700 text-gray-300 border border-gray-600'
+            !onVoteClick
+              ? 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed opacity-50'
+              : hasVoted
+              ? 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
               : 'bg-spook-violet hover:bg-spook-violet/80 text-white shadow-glow-violet'
           }`}
         >
-          {hasVoted ? '✅ Voted' : '✨ Vote'}
+          {!onVoteClick ? '🔒 Locked' : hasVoted ? '✅ Voted' : '✨ Vote'}
         </button>
       </div>
     </div>

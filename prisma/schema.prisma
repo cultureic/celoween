@@ -75,6 +75,10 @@ model Submission {
   contestId       String
   submitterAddress String
   
+  // On-chain data
+  onChainId       String?  // Smart contract submission ID
+  transactionHash String?  // On-chain submission tx hash
+  
   // Submission content
   title           String
   description     String?

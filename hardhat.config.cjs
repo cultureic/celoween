@@ -1,6 +1,13 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
-require("dotenv").config({ path: ".env.local" });
+
+// Force reload .env.local without caching
+delete require.cache[require.resolve('dotenv')];
+const fs = require('fs');
+const envConfig = require('dotenv').parse(fs.readFileSync('.env.local'));
+for (const k in envConfig) {
+  process.env[k] = envConfig[k];
+}
 
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
 const CELOSCAN_API_KEY = process.env.CELOSCAN_API_KEY || "";
@@ -39,7 +46,7 @@ module.exports = {
       accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
       chainId: 44787,
       timeout: 60000,
-      gasPrice: 100000000000, // 100 Gwei - much higher
+      gasPrice: 200000000000, // 200 Gwei - higher to avoid underpriced error
     },
     // Celo Sepolia Testnet (NEW - recommended)
     celoSepolia: {
@@ -54,7 +61,7 @@ module.exports = {
       accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
       chainId: 42220,
       gas: 10000000,
-      gasPrice: 0.5 * 10 ** 9, // 0.5 Gwei
+      gasPrice: 30 * 10 ** 9, // 30 Gwei - current mainnet requirement
     },
   },
   namedAccounts: {
