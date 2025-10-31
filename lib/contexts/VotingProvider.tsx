@@ -88,10 +88,11 @@ export function VotingProvider({
       console.log('[VOTING] Using on-chain submission ID:', onChainId);
       
       // Encode the vote function call
+      // onChainId is already a bytes32 hex string
       const encodedData = encodeFunctionData({
         abi: votingContractAbi,
         functionName: 'vote',
-        args: [BigInt(onChainId)],
+        args: [onChainId as `0x${string}`],
       });
       
       console.log('[VOTING] Executing sponsored transaction:', {
@@ -172,10 +173,11 @@ export function VotingProvider({
       console.log('[VOTING] Using on-chain submission ID for removal:', onChainId);
       
       // Encode the removeVote function call
+      // onChainId is already a bytes32 hex string
       const encodedData = encodeFunctionData({
         abi: votingContractAbi,
         functionName: 'removeVote',
-        args: [BigInt(onChainId)],
+        args: [onChainId as `0x${string}`],
       });
       
       console.log('[VOTING] Executing sponsored transaction (remove vote):', {
@@ -248,10 +250,11 @@ export function VotingProvider({
         abi: votingContractAbi,
         functionName: 'getUserVoteInContest',
         args: [BigInt(numericContestId), walletAddress as `0x${string}`],
-      }) as bigint;
+      }) as `0x${string}`;
       
-      if (onChainSubmissionId && onChainSubmissionId > 0n) {
-        return onChainSubmissionId.toString();
+      // Return the bytes32 hash as a string (or null if it's the zero hash)
+      if (onChainSubmissionId && onChainSubmissionId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+        return onChainSubmissionId;
       }
       
       return null;
@@ -279,10 +282,11 @@ export function VotingProvider({
         abi: votingContractAbi,
         functionName: 'getUserSubmission',
         args: [BigInt(numericContestId), submitterAddress as `0x${string}`],
-      }) as bigint;
+      }) as `0x${string}`;
       
-      if (onChainSubmissionId && onChainSubmissionId > 0n) {
-        return onChainSubmissionId.toString();
+      // Return the bytes32 hash as a string (or null if it's the zero hash)
+      if (onChainSubmissionId && onChainSubmissionId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+        return onChainSubmissionId;
       }
       
       return null;
