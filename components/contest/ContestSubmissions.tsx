@@ -128,7 +128,13 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
         
         if (onChainId) {
           // Ensure it's a hex string (convert BigInt if needed)
-          const hexId = typeof onChainId === 'bigint' ? `0x${(onChainId as bigint).toString(16)}` : onChainId;
+          let hexId: string;
+          if (typeof onChainId === 'bigint') {
+            // Convert to hex and pad to 32 bytes (64 hex chars + 0x prefix = 66 total)
+            hexId = `0x${(onChainId as bigint).toString(16).padStart(64, '0')}`;
+          } else {
+            hexId = onChainId;
+          }
           submission.onChainId = hexId;
           console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', hexId);
         } else {
