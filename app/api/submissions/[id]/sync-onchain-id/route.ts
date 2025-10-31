@@ -49,16 +49,16 @@ export async function POST(
       abi,
       functionName: 'getUserSubmission',
       args: [BigInt(numericContestId), submission.submitterAddress as `0x${string}`],
-    });
+    }) as `0x${string}`;
 
-    if (onChainId && onChainId > 0n) {
-      const onChainIdStr = onChainId.toString();
+    // Check if not zero hash
+    if (onChainId && onChainId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
       await prisma.submission.update({
         where: { id },
-        data: { onChainId: onChainIdStr },
+        data: { onChainId },
       });
 
-      return NextResponse.json({ onChainId: onChainIdStr });
+      return NextResponse.json({ onChainId });
     }
 
     return NextResponse.json({ error: 'No on-chain submission found' }, { status: 404 });
