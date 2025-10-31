@@ -12,13 +12,23 @@ export default function ProfilePage() {
     rewards: '0',
   });
 
-  // In a real app, fetch user stats from API
+  // Fetch user stats from API
   useEffect(() => {
-    if (authenticated && user) {
-      // TODO: Fetch user stats
-      // setStats(fetchedStats);
-    }
-  }, [authenticated, user]);
+    const fetchStats = async () => {
+      if (authenticated && user?.wallet?.address) {
+        try {
+          const res = await fetch(`/api/profile/stats?walletAddress=${user.wallet.address}`);
+          const data = await res.json();
+          if (res.ok) {
+            setStats(data);
+          }
+        } catch (error) {
+          console.error('Failed to fetch profile stats:', error);
+        }
+      }
+    };
+    fetchStats();
+  }, [authenticated, user?.wallet?.address]);
 
   if (!authenticated) {
     return (
