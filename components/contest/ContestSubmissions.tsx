@@ -30,6 +30,17 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
   const [userVotes, setUserVotes] = useState<Set<string>>(new Set());
   const [userVotedSubmissionId, setUserVotedSubmissionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previousWallet, setPreviousWallet] = useState<string | undefined>(undefined);
+
+  // Reset all state when wallet changes
+  useEffect(() => {
+    const currentWallet = user?.wallet?.address;
+    if (previousWallet && currentWallet && previousWallet !== currentWallet) {
+      console.log('[CONTEST SUBMISSIONS] Wallet changed, reloading...');
+      window.location.reload();
+    }
+    setPreviousWallet(currentWallet);
+  }, [user?.wallet?.address, previousWallet]);
 
   const fetchSubmissions = useCallback(async () => {
     try {

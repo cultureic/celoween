@@ -18,16 +18,16 @@ export function ContestSubmissionsWrapper({ contestId, contestStatus }: ContestS
   if (!address) {
     console.warn('[CONTEST] Voting contract not configured, using database-only mode');
     return (
-      <div>
-        <div className="flex justify-center mb-8">
-          <SubmissionForm contestId={contestId} useSmartContract={false} />
+        <div>
+          <div className="flex justify-center mb-8">
+            <SubmissionForm contestId={contestId} contestStatus={contestStatus} useSmartContract={false} />
+          </div>
+          <ContestSubmissions 
+            contestId={contestId} 
+            contestStatus={contestStatus}
+            useSmartContract={false}
+          />
         </div>
-        <ContestSubmissions 
-          contestId={contestId} 
-          contestStatus={contestStatus}
-          useSmartContract={false}
-        />
-      </div>
     );
   }
   
@@ -36,7 +36,7 @@ export function ContestSubmissionsWrapper({ contestId, contestStatus }: ContestS
       <SubmissionProvider votingContractAddress={address} votingContractAbi={abi as any}>
         <div>
           <div className="flex justify-center mb-8">
-            <SubmissionForm contestId={contestId} useSmartContract={true} />
+            <SubmissionForm contestId={contestId} contestStatus={contestStatus} useSmartContract={true} />
           </div>
           <ContestSubmissions 
             contestId={contestId} 

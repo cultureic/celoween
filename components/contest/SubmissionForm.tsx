@@ -7,11 +7,12 @@ import { useSubmission } from '@/lib/contexts/SubmissionProvider';
 
 interface SubmissionFormProps {
   contestId: string;
+  contestStatus?: string;
   onSuccess?: () => void;
   useSmartContract?: boolean;
 }
 
-export default function SubmissionForm({ contestId, onSuccess, useSmartContract = false }: SubmissionFormProps) {
+export default function SubmissionForm({ contestId, contestStatus, onSuccess, useSmartContract = false }: SubmissionFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -139,6 +140,9 @@ export default function SubmissionForm({ contestId, onSuccess, useSmartContract 
   }
 
   if (!isOpen) {
+    const isActive = contestStatus === 'ACTIVE';
+    const canSubmit = isActive && user?.wallet?.address;
+    
     return (
       <button
         onClick={() => {
@@ -146,11 +150,20 @@ export default function SubmissionForm({ contestId, onSuccess, useSmartContract 
             login();
             return;
           }
+          if (!isActive) {
+            alert('⚠️ Contest is not accepting submissions');
+            return;
+          }
           setIsOpen(true);
         }}
-        className="bg-spook-orange hover:bg-spook-orange/80 px-8 py-4 rounded-xl font-semibold text-lg shadow-glow-orange transition-all"
+        disabled={!isActive && !!user?.wallet?.address}
+        className={`px-8 py-4 rounded-xl font-semibold text-lg shadow-glow-orange transition-all ${
+          !isActive && user?.wallet?.address
+            ? 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-50'
+            : 'bg-spook-orange hover:bg-spook-orange/80'
+        }`}
       >
-        {!user?.wallet?.address ? '🔐 Login to Submit' : '🎤 Submit Entry'}
+        {!user?.wallet?.address ? '🔐 Login to Submit' : !isActive ? '🔒 Submissions Closed' : '🎤 Submit Entry'}
       </button>
     );
   }
