@@ -5,6 +5,7 @@ import Providers from '@/components/Providers';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import FarcasterInit from '@/components/FarcasterInit';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         
       </head>
       <body className={`${inter.variable} min-h-screen antialiased bg-celo-bg text-celo-fg font-sans`} style={{ ['--font-display' as any]: 'GT Alpina Trial Fine, ui-serif, system-ui' }}>
+        <FarcasterInit />
         <ThemeProvider>
           <Providers>
             <div className="min-h-screen flex flex-col">
