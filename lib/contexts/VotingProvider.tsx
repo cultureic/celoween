@@ -27,6 +27,7 @@ interface VotingState {
   removeVote: (submissionId: string, onChainId?: string) => Promise<void>;
   getUserVoteInContest: (contestId: string, userAddress: string) => Promise<string | null>;
   getUserSubmissionId: (contestId: string, userAddress: string) => Promise<string | null>;
+  computeSubmissionId: (contestId: string, submitterAddress: string) => Promise<string>;
   smartAccountAddress: string | undefined;
   canSponsorTransaction: boolean;
 }
@@ -296,6 +297,33 @@ export function VotingProvider({
     }
   };
 
+  const computeSubmissionId = async (contestId: string, submitterAddress: string): Promise<string> => {
+    try {
+      const { createPublicClient, http } = await import('viem');
+      const { celo } = await import('viem/chains');
+      const { readContract } = await import('viem/actions');
+      
+      const publicClient = createPublicClient({
+        chain: celo,
+        transport: http(),
+      });
+      
+      const numericContestId = hashStringToNumber(contestId);
+      
+      const computedId = await readContract(publicClient, {
+        address: votingContractAddress,
+        abi: votingContractAbi,
+        functionName: 'computeSubmissionId',
+        args: [BigInt(numericContestId), submitterAddress as `0x${string}`],
+      }) as `0x${string}`;
+      
+      return computedId;
+    } catch (error) {
+      console.error('[VOTING] Error computing submission ID:', error);
+      throw error;
+    }
+  };
+
   const votingState: VotingState = {
     isVoting,
     votingError,
@@ -306,6 +334,7 @@ export function VotingProvider({
     removeVote,
     getUserVoteInContest,
     getUserSubmissionId,
+    computeSubmissionId,
     smartAccountAddress: smartAccount.smartAccountAddress ?? undefined,
     canSponsorTransaction: smartAccount.canSponsorTransaction,
   };

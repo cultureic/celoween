@@ -118,31 +118,40 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
     if (!submission) return;
 
     try {
-      // If onChainId is missing, query contract directly
-      if (useSmartContract && voting && !submission.onChainId && submission.submitter.walletAddress) {
-        console.log('[CONTEST SUBMISSIONS] onChainId missing, fetching from contract...');
+      // If onChainId is missing, compute it from contract
+      if (useSmartContract && voting && !submission.onChainId) {
+        console.log('[CONTEST SUBMISSIONS] onChainId missing, computing from contract...');
         console.log('[CONTEST SUBMISSIONS] Query params:', { contestId, submitterAddress: submission.submitter.walletAddress });
         
-        const onChainId = await voting.getUserSubmissionId(contestId, submission.submitter.walletAddress);
-        console.log('[CONTEST SUBMISSIONS] Contract returned onChainId:', onChainId);
+        // First try to get the stored submission ID
+        let onChainId = await voting.getUserSubmissionId(contestId, submission.submitter.walletAddress);
+        console.log('[CONTEST SUBMISSIONS] getUserSubmissionId returned:', onChainId);
         
-        if (onChainId) {
-          // Ensure it's a hex string (convert BigInt if needed)
-          let hexId: string;
-          if (typeof onChainId === 'bigint') {
-            // Convert to hex and pad to 32 bytes (64 hex chars + 0x prefix = 66 total)
-            hexId = `0x${(onChainId as bigint).toString(16).padStart(64, '0')}`;
-          } else {
-            hexId = onChainId;
-          }
-          submission.onChainId = hexId;
-          console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', hexId);
+        // If no stored submission, compute what the ID should be
+        if (!onChainId || onChainId === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+          console.log('[CONTEST SUBMISSIONS] No stored submission, computing deterministic ID...');
+          onChainId = await voting.computeSubmissionId(contestId, submission.submitter.walletAddress);
+          console.log('[CONTEST SUBMISSIONS] Computed submission ID:', onChainId);
+        }
+        
+        if (onChainId && onChainId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+          submission.onChainId = onChainId;
+          console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', onChainId);
         } else {
-          console.error('[CONTEST SUBMISSIONS] No on-chain submission found for this user');
+          console.error('[CONTEST SUBMISSIONS] Could not determine on-chain ID');
+          alert(`❌ This submission doesn't exist on-chain. The submission may have failed or not been synced properly.`);
+          return;
         }
       }
       
-      const hasOnChainSubmission = submission?.onChainId !== null;
+      const hasOnChainSubmission = submission?.onChainId !== null && submission?.onChainId !== undefined;
+      
+      console.log('[CONTEST SUBMISSIONS] Voting check:', {
+        useSmartContract,
+        hasOnChainSubmission,
+        onChainId: submission?.onChainId,
+        submissionId
+      });
       
       // Use smart contract voting only if submission exists on-chain
       if (useSmartContract && voting && hasOnChainSubmission) {
