@@ -1,24 +1,24 @@
 import { NextResponse } from 'next/server';
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://celoween.vercel.app';
+
 export async function GET() {
   const manifest = {
-    name: "Celoween Halloween Contest",
-    description: "Submit your Halloween costume and vote for your favorites to win prizes on Celo!",
-    short_name: "Celoween",
-    icons: [
-      {
-        src: "/icons/ipkm.svg",
-        sizes: "any",
-        type: "image/svg+xml"
-      }
-    ],
-    start_url: "/",
-    display: "standalone",
-    background_color: "#1a0b2e",
-    theme_color: "#ff6b35",
-    farcaster: {
-      developer_fid: parseInt(process.env.FARCASTER_DEVELOPER_FID || '0'),
-      capabilities: ["auth", "social"],
+    accountAssociation: {
+      header: process.env.FARCASTER_ACCOUNT_ASSOCIATION_HEADER || "",
+      payload: process.env.FARCASTER_ACCOUNT_ASSOCIATION_PAYLOAD || "",
+      signature: process.env.FARCASTER_ACCOUNT_ASSOCIATION_SIGNATURE || ""
+    },
+    frame: {
+      version: "1",
+      name: "Celoween",
+      iconUrl: `${APP_URL}/icons/ipkm.svg`,
+      homeUrl: APP_URL,
+      imageUrl: `${APP_URL}/icons/ipkm.svg`,
+      buttonTitle: "🎃 Enter Contest",
+      splashImageUrl: `${APP_URL}/icons/ipkm.svg`,
+      splashBackgroundColor: "#1a0b2e",
+      webhookUrl: `${APP_URL}/api/webhook/farcaster`
     }
   };
 
