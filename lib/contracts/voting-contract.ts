@@ -1,6 +1,6 @@
 import votingContractJson from './voting-contract-abi.json';
 
-export const VOTING_CONTRACT_ABI = votingContractJson.abi as const;
+export const VOTING_CONTRACT_ABI = votingContractJson.abi;
 
 // Contract address - will be set after deployment
 export const VOTING_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_VOTING_CONTRACT_ADDRESS as `0x${string}` | undefined;
