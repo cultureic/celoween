@@ -125,18 +125,25 @@ export function ContestSubmissions({ contestId, contestStatus, useSmartContract 
         
         // First try to get the stored submission ID
         let onChainId = await voting.getUserSubmissionId(contestId, submission.submitter.walletAddress);
-        console.log('[CONTEST SUBMISSIONS] getUserSubmissionId returned:', onChainId);
+        console.log('[CONTEST SUBMISSIONS] getUserSubmissionId returned:', onChainId, 'type:', typeof onChainId);
         
         // If no stored submission, compute what the ID should be
         if (!onChainId || onChainId === '0x0000000000000000000000000000000000000000000000000000000000000000') {
           console.log('[CONTEST SUBMISSIONS] No stored submission, computing deterministic ID...');
           onChainId = await voting.computeSubmissionId(contestId, submission.submitter.walletAddress);
-          console.log('[CONTEST SUBMISSIONS] Computed submission ID:', onChainId);
+          console.log('[CONTEST SUBMISSIONS] Computed submission ID:', onChainId, 'type:', typeof onChainId);
         }
         
         if (onChainId && onChainId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-          submission.onChainId = onChainId;
-          console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', onChainId);
+          // Convert to hex string if it's a BigInt
+          let hexId: string;
+          if (typeof onChainId === 'bigint') {
+            hexId = `0x${onChainId.toString(16).padStart(64, '0')}`;
+          } else {
+            hexId = onChainId;
+          }
+          submission.onChainId = hexId;
+          console.log('[CONTEST SUBMISSIONS] Set submission.onChainId to:', hexId);
         } else {
           console.error('[CONTEST SUBMISSIONS] Could not determine on-chain ID');
           alert(`❌ This submission doesn't exist on-chain. The submission may have failed or not been synced properly.`);
