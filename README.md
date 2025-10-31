@@ -346,3 +346,4 @@ cat ENV_CONFIG.md
   <a href="./ENV_CONFIG.md">Configuration</a> ·
   <a href="./MIGRATION_PLAN.md">Roadmap</a>
 </div>
+# Force rebuild Fri Oct 31 15:10:41 PDT 2025
