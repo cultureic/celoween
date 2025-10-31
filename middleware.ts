@@ -287,7 +287,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const response = NextResponse.next();
   
   // Security headers
-  response.headers.set('X-Frame-Options', 'DENY');
+  // Note: X-Frame-Options removed to allow Farcaster mini app embedding
+  // Frame ancestors controlled via CSP in next.config.mjs instead
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('X-XSS-Protection', '1; mode=block');
